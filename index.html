@@ -3,197 +3,442 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClosetSwipe — AI 虛擬試穿</title>
+    <title>StyleHub — Virtual Try-On x AI Styling x Local Stores</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <!-- HEADER -->
-    <header class="app-header">
-        <div class="logo">
-            <span class="logo-icon">👗</span>
-            <span class="logo-text">ClosetSwipe</span>
+    <!-- NAVIGATION -->
+    <nav class="nav-bar" id="navBar">
+        <div class="nav-logo">StyleHub</div>
+        <div class="nav-links">
+            <a href="#home" class="nav-link active" data-page="home">Home</a>
+            <a href="#tryon" class="nav-link" data-page="tryon">Virtual Try-On</a>
+            <a href="#stores" class="nav-link" data-page="stores">Stores</a>
+            <a href="#stylist" class="nav-link" data-page="stylist">AI Stylist</a>
         </div>
-        <div class="header-center">
-            <button class="mode-btn active" id="btnModePhoto" onclick="setMode('photo')">
-                📷 照片模式
-            </button>
-            <button class="mode-btn" id="btnModeCamera" onclick="setMode('camera')">
-                🎥 鏡頭模式
-            </button>
+        <div class="nav-actions">
+            <button class="nav-btn" onclick="openAuthModal('login')">Login</button>
+            <button class="nav-btn nav-btn-primary" onclick="openAuthModal('register')">Sign Up</button>
         </div>
-        <div class="header-actions">
-            <label class="btn-upload" for="photoInput">⬆ 上傳照片</label>
-            <input type="file" id="photoInput" accept="image/*" style="display:none">
-            <button class="btn-auto" id="btnAutoPlay" onclick="toggleAutoPlay()">
-                <span id="autoIcon">▶</span> 自動展示
-            </button>
-            <button class="btn-ai-tryon" id="btnAiTryon" onclick="tryOnWithAI()">✨ 全身試穿</button>
-        </div>
-    </header>
+    </nav>
 
-    <!-- MAIN -->
-    <main class="app-main">
-        <!-- LEFT PICKERS -->
-        <div class="picker-column picker-left">
-            <div class="picker-section">
-                <span class="picker-label">上衣</span>
-                <button class="picker-arrow" onclick="cycleCategory('tops',-1)">▲</button>
-                <div class="picker-carousel" id="carousel-tops"></div>
-                <button class="picker-arrow" onclick="cycleCategory('tops',1)">▼</button>
-            </div>
-            <div class="picker-section">
-                <span class="picker-label">鞋款</span>
-                <button class="picker-arrow" onclick="cycleCategory('shoes',-1)">▲</button>
-                <div class="picker-carousel" id="carousel-shoes"></div>
-                <button class="picker-arrow" onclick="cycleCategory('shoes',1)">▼</button>
-            </div>
-        </div>
-
-        <!-- CENTER MODEL -->
-        <div class="model-area">
-            <div class="model-container" id="dropZone">
-                <!-- Drop zone highlight -->
-                <div class="drop-overlay" id="dropOverlay">
-                    <div class="drop-icon">👕</div>
-                    <div class="drop-text">放開試穿</div>
+    <!-- ==================== PAGE: HOME ==================== -->
+    <section class="page active" id="page-home">
+        <!-- Hero -->
+        <div class="hero">
+            <div class="hero-content">
+                <div class="hero-badge">Next-Gen Fashion Platform</div>
+                <h1 class="hero-title">
+                    <span class="gradient-text">StyleHub</span><br>
+                    Virtual Try-On<br>x AI Styling
+                </h1>
+                <p class="hero-desc">
+                    Upload your photo, try on outfits virtually with AI, get personalized styling recommendations,
+                    and discover local stores — all in one platform.
+                </p>
+                <div class="hero-actions">
+                    <button class="btn-primary btn-lg" onclick="navigateTo('tryon')">Start Try-On</button>
+                    <button class="btn-outline btn-lg" onclick="navigateTo('stores')">Explore Stores</button>
                 </div>
-
-                <!-- Skeleton loading preview -->
-                <div class="skeleton-overlay" id="skeletonOverlay">
-                    <svg class="skeleton-svg" viewBox="0 0 200 400">
-                        <!-- Head -->
-                        <circle cx="100" cy="40" r="20" class="skel-head"/>
-                        <!-- Neck -->
-                        <line x1="100" y1="60" x2="100" y2="80" class="skel-bone"/>
-                        <!-- Shoulders -->
-                        <line x1="60" y1="80" x2="140" y2="80" class="skel-bone"/>
-                        <!-- Spine -->
-                        <line x1="100" y1="80" x2="100" y2="200" class="skel-bone"/>
-                        <!-- Arms -->
-                        <line x1="60" y1="80" x2="35" y2="150" class="skel-bone"/>
-                        <line x1="140" y1="80" x2="165" y2="150" class="skel-bone"/>
-                        <!-- Hips -->
-                        <line x1="75" y1="200" x2="125" y2="200" class="skel-bone"/>
-                        <!-- Legs -->
-                        <line x1="75" y1="200" x2="70" y2="310" class="skel-bone"/>
-                        <line x1="125" y1="200" x2="130" y2="310" class="skel-bone"/>
-                        <!-- Feet -->
-                        <line x1="70" y1="310" x2="65" y2="360" class="skel-bone"/>
-                        <line x1="130" y1="310" x2="135" y2="360" class="skel-bone"/>
-                    </svg>
-                    <div class="skeleton-text" id="skelText">AI 正在為您穿搭...</div>
-                    <div class="skeleton-step" id="skelStep"></div>
-                </div>
-
-                <!-- Placeholder -->
-                <div class="model-placeholder" id="modelPlaceholder">
-                    <div class="placeholder-icon">📸</div>
-                    <div class="placeholder-text">上傳照片或使用預設模特兒</div>
-                    <div class="placeholder-actions">
-                        <button class="btn-use-default" onclick="useDefaultModel()">使用預設模特兒</button>
-                        <button class="btn-use-camera" onclick="setMode('camera')">開啟鏡頭</button>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="hero-stat-num">AI</div>
+                        <div class="hero-stat-label">Virtual Try-On</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-num">LBS</div>
+                        <div class="hero-stat-label">Local Stores</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-num">24/7</div>
+                        <div class="hero-stat-label">AI Stylist</div>
                     </div>
                 </div>
-
-                <!-- Model photo (before) -->
-                <img class="model-photo" id="modelPhoto" src="images/model/model1.jpg" alt="Model" style="display:none">
-                <!-- Webcam -->
-                <video class="model-video" id="modelVideo" autoplay playsinline muted style="display:none"></video>
-
-                <!-- AI Result overlay (after) -->
-                <img class="model-result" id="modelResult" style="display:none">
-
-                <!-- Comparison slider -->
-                <div class="compare-slider" id="compareSlider" style="display:none">
-                    <div class="compare-line" id="compareLine"></div>
-                    <div class="compare-handle" id="compareHandle">
-                        <span>⟷</span>
+            </div>
+            <div class="hero-visual">
+                <div class="mock-phone">
+                    <div class="mock-notch"></div>
+                    <div class="mock-body">
+                        <div class="mock-avatar"></div>
+                        <div class="mock-bar"></div>
+                        <div class="mock-bar short"></div>
+                        <div class="mock-bar"></div>
                     </div>
-                    <div class="compare-label compare-label-left">原始</div>
-                    <div class="compare-label compare-label-right">試穿後</div>
                 </div>
+                <div class="float-tag ft1">Virtual Try-On</div>
+                <div class="float-tag ft2">AI Recommend</div>
+                <div class="float-tag ft3">3km Search</div>
+            </div>
+        </div>
 
-                <!-- Auto-play indicator -->
-                <div class="auto-indicator" id="autoIndicator" style="display:none">
-                    <div class="auto-progress" id="autoProgress"></div>
+        <!-- Features -->
+        <div class="section" id="features">
+            <div class="section-header">
+                <div class="section-label">CORE FEATURES</div>
+                <h2 class="section-title">Four Modules, <span class="gradient-text">One Platform</span></h2>
+                <p class="section-desc">Technology-driven fashion commerce ecosystem</p>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card" onclick="navigateTo('tryon')">
+                    <div class="feature-icon blue">&#x1F457;</div>
+                    <h3>Virtual Try-On</h3>
+                    <p>Upload your photo and try on clothes virtually using AI image generation. Reduce return rates and see how outfits look on you.</p>
+                    <div class="feature-tags">
+                        <span class="tag blue">Core Tech</span>
+                        <span class="tag green">Lower Returns</span>
+                    </div>
+                </div>
+                <div class="feature-card" onclick="navigateTo('stylist')">
+                    <div class="feature-icon purple">&#x1F916;</div>
+                    <h3>AI Stylist Agent</h3>
+                    <p>AI learns multiple styling aesthetics and recommends complete outfits based on your body type, preferences, budget, and occasion.</p>
+                    <div class="feature-tags">
+                        <span class="tag purple">Smart Recommend</span>
+                        <span class="tag amber">Personalized</span>
+                    </div>
+                </div>
+                <div class="feature-card" onclick="navigateTo('stores')">
+                    <div class="feature-icon amber">&#x1F4CD;</div>
+                    <h3>LBS Local Stores</h3>
+                    <p>Location-based search within a configurable radius. Discover highly-rated local stores and minimize the number of shops to visit.</p>
+                    <div class="feature-tags">
+                        <span class="tag amber">LBS</span>
+                        <span class="tag green">Top Rated</span>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon green">&#x1F6D2;</div>
+                    <h3>Purchase Agency</h3>
+                    <p>Integrated purchasing and consignment services. Partner stores serve as pickup points, with items included in AI recommendations.</p>
+                    <div class="feature-tags">
+                        <span class="tag red">Agency</span>
+                        <span class="tag blue">Consignment</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How it works -->
+        <div class="section section-alt">
+            <div class="section-header">
+                <div class="section-label">HOW IT WORKS</div>
+                <h2 class="section-title">Simple <span class="gradient-text">3-Step</span> Process</h2>
+            </div>
+            <div class="steps-row">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h4>Upload Photo</h4>
+                    <p>Take a photo or upload one. Our AI detects your body pose and proportions automatically.</p>
+                </div>
+                <div class="step-arrow">&#x2192;</div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h4>Choose Outfits</h4>
+                    <p>Browse items from local stores or let AI recommend complete outfits based on your style preferences.</p>
+                </div>
+                <div class="step-arrow">&#x2192;</div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h4>Try On & Buy</h4>
+                    <p>See the AI-generated try-on result, compare before/after, then purchase directly or visit the store.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PAGE: VIRTUAL TRY-ON ==================== -->
+    <section class="page" id="page-tryon">
+        <header class="tryon-header">
+            <div class="tryon-header-center">
+                <button class="mode-btn active" id="btnModePhoto" onclick="setMode('photo')">Photo Mode</button>
+                <button class="mode-btn" id="btnModeCamera" onclick="setMode('camera')">Camera Mode</button>
+            </div>
+            <div class="tryon-header-actions">
+                <label class="btn-upload" for="photoInput">Upload Photo</label>
+                <input type="file" id="photoInput" accept="image/*" style="display:none">
+                <button class="btn-auto" id="btnAutoPlay" onclick="toggleAutoPlay()">
+                    <span id="autoIcon">&#x25B6;</span> Auto
+                </button>
+                <button class="btn-ai-tryon" id="btnAiTryon" onclick="tryOnWithAI()">AI Try-On</button>
+            </div>
+        </header>
+
+        <main class="tryon-main">
+            <!-- LEFT PICKERS -->
+            <div class="picker-column picker-left">
+                <div class="picker-section">
+                    <span class="picker-label">TOPS</span>
+                    <button class="picker-arrow" onclick="cycleCategory('tops',-1)">&#x25B2;</button>
+                    <div class="picker-carousel" id="carousel-tops"></div>
+                    <button class="picker-arrow" onclick="cycleCategory('tops',1)">&#x25BC;</button>
+                </div>
+                <div class="picker-section">
+                    <span class="picker-label">SHOES</span>
+                    <button class="picker-arrow" onclick="cycleCategory('shoes',-1)">&#x25B2;</button>
+                    <div class="picker-carousel" id="carousel-shoes"></div>
+                    <button class="picker-arrow" onclick="cycleCategory('shoes',1)">&#x25BC;</button>
                 </div>
             </div>
 
-            <!-- Outfit info -->
-            <div class="outfit-info">
-                <span class="outfit-info-label">搭配</span>
-                <span class="outfit-info-items" id="outfitItems">選擇衣物開始搭配</span>
-                <span class="outfit-info-total" id="outfitTotal"></span>
+            <!-- CENTER MODEL -->
+            <div class="model-area">
+                <div class="model-container" id="dropZone">
+                    <div class="drop-overlay" id="dropOverlay">
+                        <div class="drop-icon">&#x1F455;</div>
+                        <div class="drop-text">Drop to try on</div>
+                    </div>
+                    <div class="skeleton-overlay" id="skeletonOverlay">
+                        <svg class="skeleton-svg" viewBox="0 0 200 400">
+                            <circle cx="100" cy="40" r="20" class="skel-head"/>
+                            <line x1="100" y1="60" x2="100" y2="80" class="skel-bone"/>
+                            <line x1="60" y1="80" x2="140" y2="80" class="skel-bone"/>
+                            <line x1="100" y1="80" x2="100" y2="200" class="skel-bone"/>
+                            <line x1="60" y1="80" x2="35" y2="150" class="skel-bone"/>
+                            <line x1="140" y1="80" x2="165" y2="150" class="skel-bone"/>
+                            <line x1="75" y1="200" x2="125" y2="200" class="skel-bone"/>
+                            <line x1="75" y1="200" x2="70" y2="310" class="skel-bone"/>
+                            <line x1="125" y1="200" x2="130" y2="310" class="skel-bone"/>
+                            <line x1="70" y1="310" x2="65" y2="360" class="skel-bone"/>
+                            <line x1="130" y1="310" x2="135" y2="360" class="skel-bone"/>
+                        </svg>
+                        <div class="skeleton-text" id="skelText">AI is styling you...</div>
+                        <div class="skeleton-step" id="skelStep"></div>
+                    </div>
+                    <div class="model-placeholder" id="modelPlaceholder">
+                        <div class="placeholder-icon">&#x1F4F8;</div>
+                        <div class="placeholder-text">Upload a photo or use the default model</div>
+                        <div class="placeholder-actions">
+                            <button class="btn-use-default" onclick="useDefaultModel()">Use Default Model</button>
+                            <button class="btn-use-camera" onclick="setMode('camera')">Open Camera</button>
+                        </div>
+                    </div>
+                    <img class="model-photo" id="modelPhoto" src="images/model/model1.jpg" alt="Model" style="display:none">
+                    <video class="model-video" id="modelVideo" autoplay playsinline muted style="display:none"></video>
+                    <img class="model-result" id="modelResult" style="display:none">
+                    <div class="compare-slider" id="compareSlider" style="display:none">
+                        <div class="compare-line" id="compareLine"></div>
+                        <div class="compare-handle" id="compareHandle"><span>&#x27F7;</span></div>
+                        <div class="compare-label compare-label-left">Before</div>
+                        <div class="compare-label compare-label-right">After</div>
+                    </div>
+                    <div class="auto-indicator" id="autoIndicator" style="display:none">
+                        <div class="auto-progress" id="autoProgress"></div>
+                    </div>
+                </div>
+                <div class="outfit-info">
+                    <span class="outfit-info-label">Outfit</span>
+                    <span class="outfit-info-items" id="outfitItems">Select items to start</span>
+                    <span class="outfit-info-total" id="outfitTotal"></span>
+                </div>
+            </div>
+
+            <!-- RIGHT PICKERS -->
+            <div class="picker-column picker-right">
+                <div class="picker-section">
+                    <span class="picker-label">BOTTOMS</span>
+                    <button class="picker-arrow" onclick="cycleCategory('bottoms',-1)">&#x25B2;</button>
+                    <div class="picker-carousel" id="carousel-bottoms"></div>
+                    <button class="picker-arrow" onclick="cycleCategory('bottoms',1)">&#x25BC;</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- CHAT INPUT -->
+        <div class="chat-bar" id="chatBar">
+            <div class="chat-history" id="chatHistory"></div>
+            <div class="chat-input-row">
+                <input type="text" class="chat-input" id="chatInput"
+                       placeholder="Type adjustment instructions... e.g. 'tuck in the shirt' or 'make it darker'"
+                       onkeydown="if(event.key==='Enter')adjustWithPrompt()">
+                <button class="chat-send" onclick="adjustWithPrompt()">Adjust</button>
             </div>
         </div>
 
-        <!-- RIGHT PICKERS -->
-        <div class="picker-column picker-right">
-            <div class="picker-section">
-                <span class="picker-label">下著</span>
-                <button class="picker-arrow" onclick="cycleCategory('bottoms',-1)">▲</button>
-                <div class="picker-carousel" id="carousel-bottoms"></div>
-                <button class="picker-arrow" onclick="cycleCategory('bottoms',1)">▼</button>
+        <!-- AI MODAL -->
+        <div class="modal-overlay" id="aiModal">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeAiModal()">&#x2715;</button>
+                <div class="modal-header"><h2>AI Full-Body Try-On</h2></div>
+                <div class="modal-body">
+                    <div class="ai-loading" id="aiLoading">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text" id="aiLoadingText">AI is generating try-on results...</div>
+                        <div class="loading-subtext" id="aiLoadingSubtext">Sequential replacement: Top -> Bottom -> Shoes</div>
+                        <div class="loading-steps" id="aiSteps">
+                            <div class="step" id="step1"><span class="step-num">1</span> Top</div>
+                            <div class="step-arrow">&#x2192;</div>
+                            <div class="step" id="step2"><span class="step-num">2</span> Bottom</div>
+                            <div class="step-arrow">&#x2192;</div>
+                            <div class="step" id="step3"><span class="step-num">3</span> Shoes</div>
+                        </div>
+                    </div>
+                    <div class="ai-results" id="aiResults" style="display:none">
+                        <div class="ai-results-grid" id="aiResultsGrid"></div>
+                    </div>
+                    <div class="ai-error" id="aiError" style="display:none">
+                        <div class="error-icon">&#x26A0;&#xFE0F;</div>
+                        <div class="error-text" id="aiErrorText"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-modal-action btn-apply-result" id="btnApplyResult" onclick="applyResultToModel()" style="display:none">
+                        Apply to Main View
+                    </button>
+                    <button class="btn-modal-action" id="btnDownloadResult" onclick="downloadAiResult()" style="display:none">
+                        Download
+                    </button>
+                </div>
             </div>
         </div>
-    </main>
 
-    <!-- CHAT INPUT -->
-    <div class="chat-bar" id="chatBar">
-        <div class="chat-history" id="chatHistory"></div>
-        <div class="chat-input-row">
-            <input type="text" class="chat-input" id="chatInput"
-                   placeholder="💬 輸入調整指令... 例如「上衣紮進去」「顏色改深」"
-                   onkeydown="if(event.key==='Enter')adjustWithPrompt()">
-            <button class="chat-send" onclick="adjustWithPrompt()">調整 ✨</button>
+        <div class="keyboard-hints">
+            <span>&#x2190; &#x2192; Tops</span>
+            <span>&#x2191; &#x2193; Bottoms</span>
+            <span>S Shoes</span>
+            <span>Space Auto</span>
         </div>
-    </div>
+    </section>
 
-    <!-- AI MODAL (still used for full results view) -->
-    <div class="modal-overlay" id="aiModal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeAiModal()">✕</button>
-            <div class="modal-header"><h2>✨ AI 全身試穿</h2></div>
+    <!-- ==================== PAGE: STORES ==================== -->
+    <section class="page" id="page-stores">
+        <div class="stores-container">
+            <div class="stores-sidebar">
+                <h2 class="stores-title">Discover Local Stores</h2>
+                <div class="stores-filters">
+                    <div class="filter-group">
+                        <label class="filter-label">Search Radius</label>
+                        <div class="radius-selector">
+                            <button class="radius-btn active" data-radius="1" onclick="setRadius(1)">1km</button>
+                            <button class="radius-btn" data-radius="3" onclick="setRadius(3)">3km</button>
+                            <button class="radius-btn" data-radius="5" onclick="setRadius(5)">5km</button>
+                            <button class="radius-btn" data-radius="10" onclick="setRadius(10)">10km</button>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Category</label>
+                        <select class="filter-select" id="storeCategoryFilter" onchange="filterStores()">
+                            <option value="all">All Categories</option>
+                            <option value="casual">Casual</option>
+                            <option value="formal">Formal / Business</option>
+                            <option value="streetwear">Streetwear</option>
+                            <option value="vintage">Vintage</option>
+                            <option value="korean">Korean Style</option>
+                            <option value="japanese">Japanese Style</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Sort By</label>
+                        <select class="filter-select" id="storeSortBy" onchange="filterStores()">
+                            <option value="rating">Highest Rating</option>
+                            <option value="distance">Nearest</option>
+                            <option value="popular">Most Popular</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="store-list" id="storeList"></div>
+            </div>
+            <div class="stores-map" id="storesMap">
+                <div class="map-placeholder">
+                    <div class="map-placeholder-icon">&#x1F5FA;</div>
+                    <div class="map-placeholder-text">Map View</div>
+                    <div class="map-placeholder-desc">Store locations within your search radius</div>
+                    <div class="map-dots" id="mapDots"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PAGE: AI STYLIST ==================== -->
+    <section class="page" id="page-stylist">
+        <div class="stylist-container">
+            <div class="stylist-sidebar">
+                <h2 class="stylist-title">AI Stylist</h2>
+                <p class="stylist-desc">Tell me about yourself and I'll recommend the perfect outfit from local stores.</p>
+
+                <div class="stylist-form">
+                    <div class="form-group">
+                        <label class="form-label">Style Preference</label>
+                        <div class="style-chips">
+                            <button class="style-chip" data-style="casual" onclick="toggleStyleChip(this)">Casual</button>
+                            <button class="style-chip" data-style="formal" onclick="toggleStyleChip(this)">Formal</button>
+                            <button class="style-chip" data-style="street" onclick="toggleStyleChip(this)">Street</button>
+                            <button class="style-chip" data-style="korean" onclick="toggleStyleChip(this)">Korean</button>
+                            <button class="style-chip" data-style="japanese" onclick="toggleStyleChip(this)">Japanese</button>
+                            <button class="style-chip" data-style="minimalist" onclick="toggleStyleChip(this)">Minimalist</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Occasion</label>
+                        <select class="form-select" id="stylistOccasion">
+                            <option value="daily">Daily Wear</option>
+                            <option value="date">Date Night</option>
+                            <option value="work">Work / Office</option>
+                            <option value="party">Party / Event</option>
+                            <option value="outdoor">Outdoor / Active</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Budget Range (NTD)</label>
+                        <div class="budget-row">
+                            <input type="number" class="form-input" id="budgetMin" value="1000" min="0" step="500">
+                            <span class="budget-dash">-</span>
+                            <input type="number" class="form-input" id="budgetMax" value="5000" min="0" step="500">
+                        </div>
+                    </div>
+                    <button class="btn-primary btn-full" onclick="getAiRecommendation()">Get Recommendations</button>
+                </div>
+            </div>
+
+            <div class="stylist-main">
+                <div class="stylist-chat" id="stylistChat">
+                    <div class="chat-message ai">
+                        <div class="chat-avatar">AI</div>
+                        <div class="chat-content">
+                            <p>Welcome to StyleHub AI Stylist! Select your style preferences on the left, or just describe what you're looking for in the chat below.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="stylist-input-row">
+                    <input type="text" class="stylist-input" id="stylistInput"
+                           placeholder="Describe what you're looking for... e.g. 'casual outfit for a weekend brunch'"
+                           onkeydown="if(event.key==='Enter')sendStylistMessage()">
+                    <button class="stylist-send" onclick="sendStylistMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AUTH MODAL -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-content modal-sm">
+            <button class="modal-close" onclick="closeAuthModal()">&#x2715;</button>
+            <div class="modal-header">
+                <h2 id="authTitle">Login</h2>
+            </div>
             <div class="modal-body">
-                <div class="ai-loading" id="aiLoading">
-                    <div class="loading-spinner"></div>
-                    <div class="loading-text" id="aiLoadingText">AI 正在生成全身試穿效果...</div>
-                    <div class="loading-subtext" id="aiLoadingSubtext">逐步替換法：上衣 → 下著 → 鞋款</div>
-                    <div class="loading-steps" id="aiSteps">
-                        <div class="step" id="step1"><span class="step-num">1</span> 上衣合成</div>
-                        <div class="step-arrow">→</div>
-                        <div class="step" id="step2"><span class="step-num">2</span> 下著合成</div>
-                        <div class="step-arrow">→</div>
-                        <div class="step" id="step3"><span class="step-num">3</span> 鞋款合成</div>
+                <div class="auth-form">
+                    <div class="form-group" id="authNameGroup" style="display:none">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-input" placeholder="Your name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" placeholder="Enter password">
+                    </div>
+                    <button class="btn-primary btn-full" id="authSubmitBtn" onclick="closeAuthModal()">Login</button>
+                    <div class="auth-switch">
+                        <span id="authSwitchText">Don't have an account?</span>
+                        <a href="#" id="authSwitchLink" onclick="toggleAuthMode(event)">Sign Up</a>
                     </div>
                 </div>
-                <div class="ai-results" id="aiResults" style="display:none">
-                    <div class="ai-results-grid" id="aiResultsGrid"></div>
-                </div>
-                <div class="ai-error" id="aiError" style="display:none">
-                    <div class="error-icon">⚠️</div>
-                    <div class="error-text" id="aiErrorText"></div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-modal-action btn-apply-result" id="btnApplyResult" onclick="applyResultToModel()" style="display:none">
-                    🎯 套用到主畫面
-                </button>
-                <button class="btn-modal-action" id="btnDownloadResult" onclick="downloadAiResult()" style="display:none">
-                    📥 下載結果
-                </button>
             </div>
         </div>
-    </div>
-
-    <!-- KEYBOARD HINTS -->
-    <div class="keyboard-hints">
-        <span>← → 上衣</span>
-        <span>↑ ↓ 下著</span>
-        <span>S 鞋款</span>
-        <span>Space 自動</span>
     </div>
 
     <script src="app.js"></script>

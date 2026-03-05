@@ -5,7 +5,7 @@
  *   1. npm install
  *   2. gcloud auth login
  *   3. GCP_PROJECT_ID=your-project GCP_REGION=us-central1 node server.js
- *   4. Open http://localhost:3000
+ *   4. Open http://localhost:8080
  */
 
 const express = require('express');
@@ -14,7 +14,7 @@ const { execSync } = require('child_process');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 // --- Configuration ---
 const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID || 'tryon-488608';

@@ -618,7 +618,7 @@ function showAiError(message) {
   document.getElementById('aiError').style.display = 'flex';
   let help = message;
   if (message.includes('fetch') || message.includes('Failed')) {
-    help = '無法連線到代理伺服器。\n\n請確認已啟動：\nnode server.js\n\n然後透過 http://localhost:3000 開啟';
+    help = '無法連線到代理伺服器。\n\n請確認已啟動：\nnode server.js\n\n然後透過 http://localhost:8080 開啟';
   }
   document.getElementById('aiErrorText').textContent = help;
 }

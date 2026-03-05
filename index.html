@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClosetSwipe — AI 虛擬試穿</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="app-header">
+        <div class="logo">
+            <span class="logo-icon">👗</span>
+            <span class="logo-text">ClosetSwipe</span>
+        </div>
+        <div class="header-center">
+            <button class="mode-btn active" id="btnModePhoto" onclick="setMode('photo')">
+                📷 照片模式
+            </button>
+            <button class="mode-btn" id="btnModeCamera" onclick="setMode('camera')">
+                🎥 鏡頭模式
+            </button>
+        </div>
+        <div class="header-actions">
+            <label class="btn-upload" for="photoInput">⬆ 上傳照片</label>
+            <input type="file" id="photoInput" accept="image/*" style="display:none">
+            <button class="btn-auto" id="btnAutoPlay" onclick="toggleAutoPlay()">
+                <span id="autoIcon">▶</span> 自動展示
+            </button>
+            <button class="btn-ai-tryon" id="btnAiTryon" onclick="tryOnWithAI()">✨ 全身試穿</button>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="app-main">
+        <!-- LEFT PICKERS -->
+        <div class="picker-column picker-left">
+            <div class="picker-section">
+                <span class="picker-label">上衣</span>
+                <button class="picker-arrow" onclick="cycleCategory('tops',-1)">▲</button>
+                <div class="picker-carousel" id="carousel-tops"></div>
+                <button class="picker-arrow" onclick="cycleCategory('tops',1)">▼</button>
+            </div>
+            <div class="picker-section">
+                <span class="picker-label">鞋款</span>
+                <button class="picker-arrow" onclick="cycleCategory('shoes',-1)">▲</button>
+                <div class="picker-carousel" id="carousel-shoes"></div>
+                <button class="picker-arrow" onclick="cycleCategory('shoes',1)">▼</button>
+            </div>
+        </div>
+
+        <!-- CENTER MODEL -->
+        <div class="model-area">
+            <div class="model-container" id="dropZone">
+                <!-- Drop zone highlight -->
+                <div class="drop-overlay" id="dropOverlay">
+                    <div class="drop-icon">👕</div>
+                    <div class="drop-text">放開試穿</div>
+                </div>
+
+                <!-- Skeleton loading preview -->
+                <div class="skeleton-overlay" id="skeletonOverlay">
+                    <svg class="skeleton-svg" viewBox="0 0 200 400">
+                        <!-- Head -->
+                        <circle cx="100" cy="40" r="20" class="skel-head"/>
+                        <!-- Neck -->
+                        <line x1="100" y1="60" x2="100" y2="80" class="skel-bone"/>
+                        <!-- Shoulders -->
+                        <line x1="60" y1="80" x2="140" y2="80" class="skel-bone"/>
+                        <!-- Spine -->
+                        <line x1="100" y1="80" x2="100" y2="200" class="skel-bone"/>
+                        <!-- Arms -->
+                        <line x1="60" y1="80" x2="35" y2="150" class="skel-bone"/>
+                        <line x1="140" y1="80" x2="165" y2="150" class="skel-bone"/>
+                        <!-- Hips -->
+                        <line x1="75" y1="200" x2="125" y2="200" class="skel-bone"/>
+                        <!-- Legs -->
+                        <line x1="75" y1="200" x2="70" y2="310" class="skel-bone"/>
+                        <line x1="125" y1="200" x2="130" y2="310" class="skel-bone"/>
+                        <!-- Feet -->
+                        <line x1="70" y1="310" x2="65" y2="360" class="skel-bone"/>
+                        <line x1="130" y1="310" x2="135" y2="360" class="skel-bone"/>
+                    </svg>
+                    <div class="skeleton-text" id="skelText">AI 正在為您穿搭...</div>
+                    <div class="skeleton-step" id="skelStep"></div>
+                </div>
+
+                <!-- Placeholder -->
+                <div class="model-placeholder" id="modelPlaceholder">
+                    <div class="placeholder-icon">📸</div>
+                    <div class="placeholder-text">上傳照片或使用預設模特兒</div>
+                    <div class="placeholder-actions">
+                        <button class="btn-use-default" onclick="useDefaultModel()">使用預設模特兒</button>
+                        <button class="btn-use-camera" onclick="setMode('camera')">開啟鏡頭</button>
+                    </div>
+                </div>
+
+                <!-- Model photo (before) -->
+                <img class="model-photo" id="modelPhoto" src="images/model/model1.jpg" alt="Model" style="display:none">
+                <!-- Webcam -->
+                <video class="model-video" id="modelVideo" autoplay playsinline muted style="display:none"></video>
+
+                <!-- AI Result overlay (after) -->
+                <img class="model-result" id="modelResult" style="display:none">
+
+                <!-- Comparison slider -->
+                <div class="compare-slider" id="compareSlider" style="display:none">
+                    <div class="compare-line" id="compareLine"></div>
+                    <div class="compare-handle" id="compareHandle">
+                        <span>⟷</span>
+                    </div>
+                    <div class="compare-label compare-label-left">原始</div>
+                    <div class="compare-label compare-label-right">試穿後</div>
+                </div>
+
+                <!-- Auto-play indicator -->
+                <div class="auto-indicator" id="autoIndicator" style="display:none">
+                    <div class="auto-progress" id="autoProgress"></div>
+                </div>
+            </div>
+
+            <!-- Outfit info -->
+            <div class="outfit-info">
+                <span class="outfit-info-label">搭配</span>
+                <span class="outfit-info-items" id="outfitItems">選擇衣物開始搭配</span>
+                <span class="outfit-info-total" id="outfitTotal"></span>
+            </div>
+        </div>
+
+        <!-- RIGHT PICKERS -->
+        <div class="picker-column picker-right">
+            <div class="picker-section">
+                <span class="picker-label">下著</span>
+                <button class="picker-arrow" onclick="cycleCategory('bottoms',-1)">▲</button>
+                <div class="picker-carousel" id="carousel-bottoms"></div>
+                <button class="picker-arrow" onclick="cycleCategory('bottoms',1)">▼</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- CHAT INPUT -->
+    <div class="chat-bar" id="chatBar">
+        <div class="chat-history" id="chatHistory"></div>
+        <div class="chat-input-row">
+            <input type="text" class="chat-input" id="chatInput"
+                   placeholder="💬 輸入調整指令... 例如「上衣紮進去」「顏色改深」"
+                   onkeydown="if(event.key==='Enter')adjustWithPrompt()">
+            <button class="chat-send" onclick="adjustWithPrompt()">調整 ✨</button>
+        </div>
+    </div>
+
+    <!-- AI MODAL (still used for full results view) -->
+    <div class="modal-overlay" id="aiModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeAiModal()">✕</button>
+            <div class="modal-header"><h2>✨ AI 全身試穿</h2></div>
+            <div class="modal-body">
+                <div class="ai-loading" id="aiLoading">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text" id="aiLoadingText">AI 正在生成全身試穿效果...</div>
+                    <div class="loading-subtext" id="aiLoadingSubtext">逐步替換法：上衣 → 下著 → 鞋款</div>
+                    <div class="loading-steps" id="aiSteps">
+                        <div class="step" id="step1"><span class="step-num">1</span> 上衣合成</div>
+                        <div class="step-arrow">→</div>
+                        <div class="step" id="step2"><span class="step-num">2</span> 下著合成</div>
+                        <div class="step-arrow">→</div>
+                        <div class="step" id="step3"><span class="step-num">3</span> 鞋款合成</div>
+                    </div>
+                </div>
+                <div class="ai-results" id="aiResults" style="display:none">
+                    <div class="ai-results-grid" id="aiResultsGrid"></div>
+                </div>
+                <div class="ai-error" id="aiError" style="display:none">
+                    <div class="error-icon">⚠️</div>
+                    <div class="error-text" id="aiErrorText"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-action btn-apply-result" id="btnApplyResult" onclick="applyResultToModel()" style="display:none">
+                    🎯 套用到主畫面
+                </button>
+                <button class="btn-modal-action" id="btnDownloadResult" onclick="downloadAiResult()" style="display:none">
+                    📥 下載結果
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KEYBOARD HINTS -->
+    <div class="keyboard-hints">
+        <span>← → 上衣</span>
+        <span>↑ ↓ 下著</span>
+        <span>S 鞋款</span>
+        <span>Space 自動</span>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

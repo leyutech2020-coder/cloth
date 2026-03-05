@@ -1,0 +1,14 @@
+{
+  "name": "closetswipe-demo",
+  "version": "1.0.0",
+  "description": "ClosetSwipe Virtual Try-On Demo with Google Vertex AI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}

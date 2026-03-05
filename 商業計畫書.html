@@ -1,0 +1,2008 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StyleHub — 虛擬試穿 × AI穿搭 × 代購平台 商業計畫書</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1D4ED8;
+            --accent: #F59E0B;
+            --accent-light: #FBBF24;
+            --bg: #F8FAFC;
+            --surface: #FFFFFF;
+            --surface-alt: #F1F5F9;
+            --text: #0F172A;
+            --text-secondary: #475569;
+            --text-light: #94A3B8;
+            --border: #E2E8F0;
+            --success: #10B981;
+            --danger: #EF4444;
+            --purple: #8B5CF6;
+            --gradient: linear-gradient(135deg, #2563EB 0%, #7C3AED 50%, #F59E0B 100%);
+            --shadow: 0 4px 24px rgba(0, 0, 0, .06);
+            --shadow-lg: 0 12px 40px rgba(0, 0, 0, .1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* NAV */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, .85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 22px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 13px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            transition: .2s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        /* SLIDE */
+        .slide {
+            min-height: 100vh;
+            padding: 100px 60px 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .slide:nth-child(even) {
+            background: var(--surface-alt);
+        }
+
+        .slide-inner {
+            max-width: 1200px;
+            width: 100%;
+            animation: fadeUp .7s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* TYPOGRAPHY */
+        .slide-number {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1.25;
+            margin-bottom: 8px;
+        }
+
+        .slide-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .gradient-text {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        /* CARDS */
+        .card-grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .card-grid.col2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .card-grid.col3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .card-grid.col4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: .3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon.blue {
+            background: #EFF6FF;
+            color: var(--primary);
+        }
+
+        .card-icon.amber {
+            background: #FFFBEB;
+            color: var(--accent);
+        }
+
+        .card-icon.green {
+            background: #ECFDF5;
+            color: var(--success);
+        }
+
+        .card-icon.purple {
+            background: #F5F3FF;
+            color: var(--purple);
+        }
+
+        .card-icon.red {
+            background: #FEF2F2;
+            color: var(--danger);
+        }
+
+        .card h4 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .card p,
+        .card li {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .card ul {
+            padding-left: 18px;
+        }
+
+        /* HERO */
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .hero-title {
+            font-size: 52px;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .hero-desc {
+            font-size: 17px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            line-height: 1.9;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+        }
+
+        .hero-stat-num {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .hero-stat-label {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+
+        .hero-visual {
+            background: linear-gradient(135deg, #EFF6FF, #F5F3FF);
+            border-radius: 24px;
+            padding: 40px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 1px solid var(--border);
+        }
+
+        .hero-visual .mock-phone {
+            width: 200px;
+            height: 380px;
+            background: #fff;
+            border-radius: 28px;
+            box-shadow: var(--shadow-lg);
+            border: 3px solid #222;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .mock-phone .notch {
+            width: 100px;
+            height: 22px;
+            background: #222;
+            border-radius: 0 0 14px 14px;
+            margin-bottom: 12px;
+        }
+
+        .mock-phone .mock-body {
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            gap: 10px;
+        }
+
+        .mock-phone .mock-avatar {
+            width: 80px;
+            height: 100px;
+            background: linear-gradient(135deg, #DBEAFE, #E9D5FF);
+            border-radius: 12px;
+        }
+
+        .mock-phone .mock-bar {
+            width: 90%;
+            height: 10px;
+            background: var(--surface-alt);
+            border-radius: 5px;
+        }
+
+        .mock-phone .mock-bar.short {
+            width: 60%;
+        }
+
+        .float-tag {
+            position: absolute;
+            background: #fff;
+            padding: 10px 18px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .float-tag.t1 {
+            top: 30px;
+            right: 20px;
+            color: var(--primary);
+        }
+
+        .float-tag.t2 {
+            bottom: 60px;
+            left: 20px;
+            color: var(--success);
+        }
+
+        .float-tag.t3 {
+            bottom: 30px;
+            right: 40px;
+            color: var(--purple);
+        }
+
+        /* TABLE */
+        .styled-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 14px;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .styled-table th {
+            background: var(--primary);
+            color: #fff;
+            padding: 14px 20px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .styled-table td {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .styled-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .styled-table tr:hover td {
+            background: #F8FAFC;
+        }
+
+        /* FLOW */
+        .flow-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 32px 0;
+        }
+
+        .flow-step {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 28px;
+            text-align: center;
+            min-width: 140px;
+            transition: .3s;
+        }
+
+        .flow-step:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .flow-step .step-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .flow-step .step-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .flow-step .step-desc {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .flow-arrow {
+            font-size: 24px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* BADGE / TAG */
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 2px;
+        }
+
+        .tag.blue {
+            background: #DBEAFE;
+            color: #1D4ED8;
+        }
+
+        .tag.green {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .tag.amber {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .tag.red {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .tag.purple {
+            background: #EDE9FE;
+            color: #5B21B6;
+        }
+
+        /* HIGHLIGHT BOX */
+        .highlight-box {
+            background: linear-gradient(135deg, #EFF6FF, #F5F3FF);
+            border: 1px solid #BFDBFE;
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin: 16px 0;
+        }
+
+        .highlight-box.amber {
+            background: linear-gradient(135deg, #FFFBEB, #FEF3C7);
+            border-color: #FDE68A;
+        }
+
+        .highlight-box.green {
+            background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
+            border-color: #A7F3D0;
+        }
+
+        /* COST TABLE */
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .cost-row:last-child {
+            border: none;
+        }
+
+        .cost-label {
+            color: var(--text-secondary);
+        }
+
+        .cost-value {
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .cost-total {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary);
+            padding-top: 12px;
+            border-top: 2px solid var(--primary);
+            margin-top: 8px;
+        }
+
+        /* TIMELINE */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 14px;
+            top: 8px;
+            bottom: 8px;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--primary), var(--purple), var(--accent));
+            border-radius: 3px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 32px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -33px;
+            top: 6px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            background: #fff;
+        }
+
+        .timeline-item:nth-child(2) .timeline-dot {
+            border-color: var(--purple);
+        }
+
+        .timeline-item:nth-child(3) .timeline-dot {
+            border-color: var(--accent);
+        }
+
+        .timeline-item:nth-child(4) .timeline-dot {
+            border-color: var(--success);
+        }
+
+        .timeline-phase {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .timeline-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .timeline-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* TWO COL */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .three-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 24px;
+        }
+
+        /* PROGRESS */
+        .progress-bar {
+            height: 8px;
+            background: var(--surface-alt);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--gradient);
+        }
+
+        /* RISK */
+        .risk-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .risk-item:last-child {
+            border: none;
+        }
+
+        .risk-level {
+            min-width: 60px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .risk-level.high {
+            background: var(--danger);
+        }
+
+        .risk-level.mid {
+            background: var(--accent);
+        }
+
+        .risk-level.low {
+            background: var(--success);
+        }
+
+        /* PIE MOCK */
+        .pie-mock {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary) 0% 35%, var(--purple) 35% 55%, var(--accent) 55% 75%, var(--success) 75% 90%, var(--text-light) 90% 100%);
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .pie-center {
+            position: absolute;
+            inset: 30px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .pie-center span {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        .pie-center strong {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        /* FOOTER */
+        .slide-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        /* RESPONSIVE */
+        @media(max-width:900px) {
+            .slide {
+                padding: 80px 24px 40px;
+            }
+
+            .hero-grid,
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+
+            .card-grid.col3,
+            .card-grid.col4 {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .slide-title {
+                font-size: 32px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        @media(max-width:600px) {
+
+            .card-grid.col2,
+            .card-grid.col3,
+            .card-grid.col4 {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-row {
+                flex-direction: column;
+            }
+
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <nav class="nav">
+        <div class="nav-logo">StyleHub</div>
+        <div class="nav-links">
+            <a href="#cover" class="active">首頁</a>
+            <a href="#pain">痛點</a>
+            <a href="#solution">解決方案</a>
+            <a href="#tryon">虛擬試穿</a>
+            <a href="#ai">AI穿搭</a>
+            <a href="#merchant">商家平台</a>
+            <a href="#revenue">營收模式</a>
+            <a href="#proxy">代購</a>
+            <a href="#flow">流程</a>
+            <a href="#tech">技術</a>
+            <a href="#cost">成本</a>
+            <a href="#risk">風險</a>
+            <a href="#roadmap">路線圖</a>
+            <a href="#todo">待辦</a>
+        </div>
+    </nav>
+
+    <!-- ==================== SLIDE 1: COVER ==================== -->
+    <section class="slide" id="cover" style="background:linear-gradient(160deg,#F8FAFC 0%,#EFF6FF 40%,#F5F3FF 100%);">
+        <div class="slide-inner hero-grid">
+            <div>
+                <div class="hero-badge">2026 商業計畫書</div>
+                <h1 class="hero-title">
+                    <span class="gradient-text">StyleHub</span><br>
+                    虛擬試穿 × AI穿搭<br>× 代購整合平台
+                </h1>
+                <p class="hero-desc">
+                    結合 Virtual Try-On 虛擬試穿核心技術、AI 穿搭顧問智能推薦、LBS 地理圍欄在地化服務，與代購寄賣商業模式，打造次世代服飾電商生態系。
+                </p>
+                <div class="hero-stats">
+                    <div>
+                        <div class="hero-stat-num">4合1</div>
+                        <div class="hero-stat-label">平台整合</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-num">LBS</div>
+                        <div class="hero-stat-label">地理服務</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-num">AI</div>
+                        <div class="hero-stat-label">智能穿搭</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="mock-phone">
+                    <div class="notch"></div>
+                    <div class="mock-body">
+                        <div class="mock-avatar"></div>
+                        <div class="mock-bar"></div>
+                        <div class="mock-bar short"></div>
+                        <div class="mock-bar"></div>
+                    </div>
+                </div>
+                <div class="float-tag t1">👗 Virtual Try-On</div>
+                <div class="float-tag t2">✅ AI 推薦</div>
+                <div class="float-tag t3">📍 3km 搜尋</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 2: MARKET PAIN POINTS ==================== -->
+    <section class="slide" id="pain">
+        <div class="slide-inner">
+            <div class="slide-number">01 — 市場痛點分析</div>
+            <h2 class="slide-title">為什麼需要 <span class="gradient-text">StyleHub</span>？</h2>
+            <p class="slide-subtitle">現行服飾消費市場存在的四大核心痛點</p>
+            <div class="card-grid col4">
+                <div class="card">
+                    <div class="card-icon red">😞</div>
+                    <h4>高退貨率</h4>
+                    <p>線上購買服飾的退貨率高達 <strong>30-40%</strong>，主因為無法試穿導致尺寸與風格不符，造成物流與環境成本浪費。</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon amber">🤔</div>
+                    <h4>搭配困難</h4>
+                    <p>消費者缺乏專業穿搭知識，面對大量商品不知如何搭配，往往因選擇困難而放棄購買或買錯風格。</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon blue">🏬</div>
+                    <h4>在地商家困境</h4>
+                    <p>中小型實體店家缺乏數位工具與曝光管道，難以與大型電商競爭，客源侷限於路過人潮。</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon purple">🌏</div>
+                    <h4>代購信任問題</h4>
+                    <p>海外代購缺乏集中平台與信任機制，消費者難以確認商品真偽與品質，交易風險高。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 3: SOLUTION OVERVIEW ==================== -->
+    <section class="slide" id="solution">
+        <div class="slide-inner">
+            <div class="slide-number">02 — 解決方案總覽</div>
+            <h2 class="slide-title">四大核心模組 <span class="gradient-text">一站整合</span></h2>
+            <p class="slide-subtitle">StyleHub 以技術驅動商業，構建完整的服飾消費生態系統</p>
+            <div class="card-grid col2">
+                <div class="card" style="border-left:4px solid var(--primary);">
+                    <div class="card-icon blue">👗</div>
+                    <h4>模組一：Virtual Try-On 虛擬試穿</h4>
+                    <p>用戶上傳照片即可與商家商品進行虛擬試穿，以 AI 影像生成技術實現逼真的穿搭效果，大幅降低退貨率。</p>
+                    <div style="margin-top:12px;">
+                        <span class="tag blue">核心技術力</span>
+                        <span class="tag green">降低退貨</span>
+                    </div>
+                </div>
+                <div class="card" style="border-left:4px solid var(--purple);">
+                    <div class="card-icon purple">🤖</div>
+                    <h4>模組二：AI 穿搭顧問 Agent</h4>
+                    <p>AI Agent 學習多種穿搭風格，根據用戶身型、偏好、預算與場合，從合作商家商品中智能推薦整套穿搭方案。</p>
+                    <div style="margin-top:12px;">
+                        <span class="tag purple">智能推薦</span>
+                        <span class="tag amber">個人化</span>
+                    </div>
+                </div>
+                <div class="card" style="border-left:4px solid var(--accent);">
+                    <div class="card-icon amber">📍</div>
+                    <h4>模組三：LBS 在地化商家平台</h4>
+                    <p>結合地理定位服務，用戶可限定搜尋範圍（如方圓3km），搭配好評制度優先推薦優質在地店家，並最小化購買店家數。</p>
+                    <div style="margin-top:12px;">
+                        <span class="tag amber">LBS定位</span>
+                        <span class="tag green">好評優先</span>
+                    </div>
+                </div>
+                <div class="card" style="border-left:4px solid var(--success);">
+                    <div class="card-icon green">🛒</div>
+                    <h4>模組四：代購 / 寄賣整合</h4>
+                    <p>平台兼具代購代理功能，合作商家可作為寄賣點，代購商品也納入 AI 推薦池與虛擬試穿體系。</p>
+                    <div style="margin-top:12px;">
+                        <span class="tag red">代購整合</span>
+                        <span class="tag blue">寄賣通路</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 4: VIRTUAL TRY-ON ==================== -->
+    <section class="slide" id="tryon">
+        <div class="slide-inner">
+            <div class="slide-number">03 — 核心技術：虛擬試穿</div>
+            <h2 class="slide-title">Virtual Try-On <span class="gradient-text">技術架構</span></h2>
+            <p class="slide-subtitle">以深度學習與影像生成技術，實現高擬真的線上試穿體驗</p>
+            <div class="two-col">
+                <div>
+                    <h3>🔬 技術原理</h3>
+                    <div class="card" style="margin-bottom:20px;">
+                        <h4>影像處理流程</h4>
+                        <ul>
+                            <li><strong>姿態估計 (Pose Estimation)</strong>：偵測用戶身體關鍵點</li>
+                            <li><strong>人體分割 (Body Segmentation)</strong>：精準分離衣物與身體</li>
+                            <li><strong>服裝變形 (Garment Warping)</strong>：根據體型調整衣物形狀</li>
+                            <li><strong>影像融合 (Image Synthesis)</strong>：生成自然的試穿效果圖</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>可選技術方案</h4>
+                        <table class="styled-table">
+                            <tr>
+                                <th>方案</th>
+                                <th>特點</th>
+                                <th>成本</th>
+                            </tr>
+                            <tr>
+                                <td>開源模型自建</td>
+                                <td>HR-VITON、GP-VTON 等</td>
+                                <td>低（需GPU算力）</td>
+                            </tr>
+                            <tr>
+                                <td>雲端 API</td>
+                                <td>Google、FashionAI 等第三方</td>
+                                <td>中（按量計費）</td>
+                            </tr>
+                            <tr>
+                                <td>自研模型</td>
+                                <td>客製化訓練，效果最佳</td>
+                                <td>高（長期投入）</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <h3>📐 商品建模流程</h3>
+                    <div class="card" style="margin-bottom:20px;">
+                        <h4>商家上傳商品所需資料</h4>
+                        <ul>
+                            <li>正面平拍照片（白底或淺色背景最佳）</li>
+                            <li>商品基本資訊（尺寸表、材質、顏色色碼）</li>
+                            <li>分類標籤（上衣/下著/外套/鞋款/配件）</li>
+                            <li>價格與庫存資訊</li>
+                        </ul>
+                    </div>
+                    <div class="highlight-box">
+                        <h4>💰 建模成本估算</h4>
+                        <div class="cost-row"><span class="cost-label">自動化 AI 建模（單件）</span><span class="cost-value">NT$
+                                0 ~ 5</span></div>
+                        <div class="cost-row"><span class="cost-label">半自動 + 人工校正（單件）</span><span class="cost-value">NT$
+                                20 ~ 50</span></div>
+                        <div class="cost-row"><span class="cost-label">高品質 3D 建模（單件）</span><span class="cost-value">NT$
+                                200 ~ 800</span></div>
+                        <div class="cost-row"><span class="cost-label">GPU 雲端推論（單次試穿）</span><span class="cost-value">NT$
+                                0.5 ~ 2</span></div>
+                        <p style="font-size:12px;color:var(--text-light);margin-top:12px;">* 初期建議採自動化 AI 建模，降低商家進入門檻</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 5: AI AGENT ==================== -->
+    <section class="slide" id="ai">
+        <div class="slide-inner">
+            <div class="slide-number">04 — AI 穿搭顧問</div>
+            <h2 class="slide-title">穿搭 AI Agent <span class="gradient-text">智能推薦引擎</span></h2>
+            <p class="slide-subtitle">讓每位用戶都擁有專屬穿搭顧問，從商家商品庫中打造最佳穿搭方案</p>
+            <div class="two-col">
+                <div>
+                    <h3>🧠 AI Agent 能力</h3>
+                    <div class="card-grid" style="grid-template-columns:1fr;">
+                        <div class="card">
+                            <h4>風格學習引擎</h4>
+                            <ul>
+                                <li>學習日系、韓系、美式、街頭、商務、約會等多種風格</li>
+                                <li>分析季節趨勢、色彩搭配理論、版型比例</li>
+                                <li>透過用戶回饋不斷優化推薦精準度</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h4>推薦邏輯</h4>
+                            <ul>
+                                <li>接收用戶照片、身高體重、風格偏好、預算</li>
+                                <li>設定地理範圍（如 3km），篩選合作商家</li>
+                                <li><strong>好評優先</strong>：高評分商家權重更高</li>
+                                <li><strong>最少店家</strong>：優先在最少店家完成整套穿搭</li>
+                                <li>推薦包含上衣、下著、外套、鞋款、配件的完整方案</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>🔄 推薦流程</h3>
+                    <div class="flow-row" style="flex-direction:column;gap:16px;">
+                        <div class="flow-step"
+                            style="width:100%;text-align:left;display:flex;align-items:center;gap:16px;">
+                            <span class="step-icon">📸</span>
+                            <div>
+                                <div class="step-label">用戶輸入</div>
+                                <div class="step-desc">上傳照片 + 身高體重 + 風格 + 預算 + 位置範圍</div>
+                            </div>
+                        </div>
+                        <div style="color:var(--primary);font-size:20px;text-align:center;">↓</div>
+                        <div class="flow-step"
+                            style="width:100%;text-align:left;display:flex;align-items:center;gap:16px;">
+                            <span class="step-icon">🔍</span>
+                            <div>
+                                <div class="step-label">商家篩選</div>
+                                <div class="step-desc">LBS 地理圍欄 → 好評排序 → 庫存檢查</div>
+                            </div>
+                        </div>
+                        <div style="color:var(--primary);font-size:20px;text-align:center;">↓</div>
+                        <div class="flow-step"
+                            style="width:100%;text-align:left;display:flex;align-items:center;gap:16px;">
+                            <span class="step-icon">🤖</span>
+                            <div>
+                                <div class="step-label">AI 方案生成</div>
+                                <div class="step-desc">多套穿搭方案 × 預算分配 × 最少店家路線</div>
+                            </div>
+                        </div>
+                        <div style="color:var(--primary);font-size:20px;text-align:center;">↓</div>
+                        <div class="flow-step"
+                            style="width:100%;text-align:left;display:flex;align-items:center;gap:16px;">
+                            <span class="step-icon">👗</span>
+                            <div>
+                                <div class="step-label">虛擬試穿</div>
+                                <div class="step-desc">一鍵試穿推薦方案，支援替換單品微調</div>
+                            </div>
+                        </div>
+                        <div style="color:var(--primary);font-size:20px;text-align:center;">↓</div>
+                        <div class="flow-step"
+                            style="width:100%;text-align:left;display:flex;align-items:center;gap:16px;">
+                            <span class="step-icon">🛒</span>
+                            <div>
+                                <div class="step-label">一鍵購買</div>
+                                <div class="step-desc">整套方案加入購物車，導航至最近門市</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 6: MERCHANT PLATFORM ==================== -->
+    <section class="slide" id="merchant">
+        <div class="slide-inner">
+            <div class="slide-number">05 — 商家合作平台</div>
+            <h2 class="slide-title">商家入駐與 <span class="gradient-text">合作模式</span></h2>
+            <p class="slide-subtitle">提供完整的商家工具鏈，降低入駐門檻，共創雙贏生態</p>
+            <div class="two-col">
+                <div>
+                    <h3>🏪 商家後台功能</h3>
+                    <div class="card-grid" style="grid-template-columns:1fr;">
+                        <div class="card">
+                            <h4>商品管理</h4>
+                            <ul>
+                                <li>批次上傳商品照片，AI 自動建模</li>
+                                <li>尺寸表管理與庫存同步</li>
+                                <li>商品分類標籤與風格標記</li>
+                                <li>代購 / 寄賣商品獨立管理</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h4>數據儀表板</h4>
+                            <ul>
+                                <li>試穿次數、轉換率、成交額統計</li>
+                                <li>AI 曝光數據與推薦排名</li>
+                                <li>客戶評價管理與回覆</li>
+                                <li>月度帳單與傭金明細</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>⭐ 好評制度設計</h3>
+                    <div class="card" style="margin-bottom:20px;">
+                        <h4>評分機制</h4>
+                        <ul>
+                            <li><strong>商品品質</strong>：實物與照片相符度（1-5 星）</li>
+                            <li><strong>服務態度</strong>：溝通回應速度與態度</li>
+                            <li><strong>出貨速度</strong>：訂單處理與物流效率</li>
+                            <li><strong>尺寸準確</strong>：試穿效果與實際差異</li>
+                        </ul>
+                    </div>
+                    <div class="highlight-box green">
+                        <h4>🏆 好評效益</h4>
+                        <p style="font-size:14px;color:var(--text-secondary);">
+                            綜合評分 ≥ 4.5 → <strong>AI 推薦權重 +30%</strong><br>
+                            綜合評分 ≥ 4.0 → 正常推薦權重<br>
+                            綜合評分 < 3.5 → 降低推薦 + 平台介入<br>
+                                連續低評 → 下架警告 → 終止合作
+                        </p>
+                    </div>
+                    <div class="card">
+                        <h4>🗺️ 最少店家演算法</h4>
+                        <p>AI 在生成穿搭方案時，優先從「單一商家」湊齊所有品項，次選「兩家店」，以此類推，減少用戶跑店成本。配合導航引導用戶最短路線取貨。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 7: REVENUE MODEL ==================== -->
+    <section class="slide" id="revenue">
+        <div class="slide-inner">
+            <div class="slide-number">06 — 營收模式分析</div>
+            <h2 class="slide-title">雙軌營收 <span class="gradient-text">定價策略</span></h2>
+            <p class="slide-subtitle">月租訂閱制 + 按件抽傭制，商家可依自身經營模式自由選擇或混合搭配</p>
+            <div class="two-col">
+                <div>
+                    <h3>💳 方案 A — 月租訂閱制</h3>
+                    <div class="card" style="border-top:4px solid var(--primary);">
+                        <table class="styled-table">
+                            <tr>
+                                <th>方案</th>
+                                <th>月費</th>
+                                <th>上架商品數</th>
+                                <th>功能</th>
+                            </tr>
+                            <tr>
+                                <td><span class="tag blue">基礎版</span></td>
+                                <td>NT$ 1,500/月</td>
+                                <td>≤ 100 件</td>
+                                <td>基本試穿 + 上架</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag purple">進階版</span></td>
+                                <td>NT$ 3,500/月</td>
+                                <td>≤ 500 件</td>
+                                <td>AI 推薦曝光 + 數據分析</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag amber">旗艦版</span></td>
+                                <td>NT$ 6,500/月</td>
+                                <td>無上限</td>
+                                <td>優先推薦 + 專屬客服 + API</td>
+                            </tr>
+                        </table>
+                        <div class="highlight-box" style="margin-top:16px;">
+                            <p style="font-size:14px;">✅ 適合：<strong>商品數多、月銷量穩定</strong>的中型以上店家<br>
+                                💡 長約優惠：年繳 85 折，送首月免費</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>📊 方案 B — 按件抽傭制</h3>
+                    <div class="card" style="border-top:4px solid var(--accent);">
+                        <table class="styled-table">
+                            <tr>
+                                <th>交易來源</th>
+                                <th>抽傭比例</th>
+                                <th>說明</th>
+                            </tr>
+                            <tr>
+                                <td>AI 推薦成交</td>
+                                <td>8 ~ 12%</td>
+                                <td>透過穿搭推薦導購成交</td>
+                            </tr>
+                            <tr>
+                                <td>試穿後成交</td>
+                                <td>5 ~ 8%</td>
+                                <td>用戶主動試穿後購買</td>
+                            </tr>
+                            <tr>
+                                <td>自然搜尋成交</td>
+                                <td>3 ~ 5%</td>
+                                <td>用戶直接搜尋商家購買</td>
+                            </tr>
+                            <tr>
+                                <td>代購商品</td>
+                                <td>10 ~ 15%</td>
+                                <td>平台代購商品抽傭</td>
+                            </tr>
+                        </table>
+                        <div class="highlight-box amber" style="margin-top:16px;">
+                            <p style="font-size:14px;">✅ 適合：<strong>新進商家、小量經營</strong>的微型店家<br>
+                                💡 零風險起步，無基本費用，賣多少付多少</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="highlight-box" style="margin-top:32px;">
+                <h4>🔀 混合模式推薦</h4>
+                <p style="font-size:14px;color:var(--text-secondary);">
+                    建議中型商家採 <strong>「低月租 + 低抽傭」</strong> 混合模式（例：月費 NT$ 1,000 + 抽傭 5%），降低固定成本同時享有基本功能。平台可依商家規模智能推薦最適方案。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 8: PROXY PURCHASE ==================== -->
+    <section class="slide" id="proxy">
+        <div class="slide-inner">
+            <div class="slide-number">07 — 代購 / 寄賣整合</div>
+            <h2 class="slide-title">代購代理與 <span class="gradient-text">寄賣通路</span></h2>
+            <p class="slide-subtitle">將代購業務深度整合至平台生態，商家同時作為寄賣點，擴大商品豐富度</p>
+            <div class="two-col">
+                <div>
+                    <h3>🛍️ 代購業務流程</h3>
+                    <div class="flow-row" style="flex-direction:column;gap:12px;">
+                        <div class="flow-step"
+                            style="width:100%;text-align:left;display:flex;align-items:center;gap:16px;">
+                            <span class="step-icon">🌐</span>
+                            <div>
+                                <div class="step-label">海外選品</div>
+                                <div class="step-desc">平台 / 代購主理人海外選品採購</div>
+                            </div>
+                        </div>
+                        <div style="color:var(--primary);font-size:18px;text-align:center;">↓</div>
+                        <div class="flow-step"
+                            style="width:100%;text-align:left;display:flex;align-items:center;gap:16px;">
+                            <span class="step-icon">📦</span>
+                            <div>
+                                <div class="step-label">商品入庫</div>
+                                <div class="step-desc">拍照建模 → AI 自動生成虛擬試穿素材</div>
+                            </div>
+                        </div>
+                        <div style="color:var(--primary);font-size:18px;text-align:center;">↓</div>
+                        <div class="flow-step"
+                            style="width:100%;text-align:left;display:flex;align-items:center;gap:16px;">
+                            <span class="step-icon">🏬</span>
+                            <div>
+                                <div class="step-label">寄賣分發</div>
+                                <div class="step-desc">分配至合作商家門市展示與寄賣</div>
+                            </div>
+                        </div>
+                        <div style="color:var(--primary);font-size:18px;text-align:center;">↓</div>
+                        <div class="flow-step"
+                            style="width:100%;text-align:left;display:flex;align-items:center;gap:16px;">
+                            <span class="step-icon">💰</span>
+                            <div>
+                                <div class="step-label">成交分潤</div>
+                                <div class="step-desc">平台 / 商家 / 代購方三方分潤</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>💼 代購商業模型</h3>
+                    <div class="card" style="margin-bottom:20px;">
+                        <h4>代理權架構</h4>
+                        <ul>
+                            <li><strong>品牌代理</strong>：取得海外品牌台灣代理權，獨家銷售</li>
+                            <li><strong>選品代購</strong>：無代理權，以個人名義採購轉售</li>
+                            <li><strong>平台直送</strong>：與海外電商合作，由平台統一集貨</li>
+                        </ul>
+                        <p style="margin-top:12px;font-size:13px;color:var(--danger);">⚠️ 需注意商標法、進口關稅、商品檢驗等法規</p>
+                    </div>
+                    <div class="card">
+                        <h4>寄賣分潤比例建議</h4>
+                        <table class="styled-table">
+                            <tr>
+                                <th>角色</th>
+                                <th>分潤比例</th>
+                                <th>說明</th>
+                            </tr>
+                            <tr>
+                                <td>代購方</td>
+                                <td>50 ~ 60%</td>
+                                <td>採購成本 + 利潤</td>
+                            </tr>
+                            <tr>
+                                <td>寄賣商家</td>
+                                <td>15 ~ 25%</td>
+                                <td>店面展示 + 銷售服務</td>
+                            </tr>
+                            <tr>
+                                <td>平台</td>
+                                <td>15 ~ 25%</td>
+                                <td>技術 + 推薦 + 金流</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 9: USER FLOW ==================== -->
+    <section class="slide" id="flow">
+        <div class="slide-inner">
+            <div class="slide-number">08 — 用戶體驗流程</div>
+            <h2 class="slide-title">使用者 <span class="gradient-text">完整旅程</span></h2>
+            <p class="slide-subtitle">從進入平台到完成購買的端到端體驗設計</p>
+            <div class="flow-row">
+                <div class="flow-step">
+                    <div class="step-icon">📱</div>
+                    <div class="step-label">開啟 App</div>
+                    <div class="step-desc">登入 / 註冊</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-icon">📸</div>
+                    <div class="step-label">上傳照片</div>
+                    <div class="step-desc">全身照+體型資料</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-icon">🎨</div>
+                    <div class="step-label">選擇風格</div>
+                    <div class="step-desc">場合+預算+風格</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-icon">📍</div>
+                    <div class="step-label">設定範圍</div>
+                    <div class="step-desc">地理圍欄(1~10km)</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-icon">🤖</div>
+                    <div class="step-label">AI 推薦</div>
+                    <div class="step-desc">多套穿搭方案</div>
+                </div>
+            </div>
+            <div class="flow-row">
+                <div class="flow-step">
+                    <div class="step-icon">👗</div>
+                    <div class="step-label">虛擬試穿</div>
+                    <div class="step-desc">一鍵切換方案</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-icon">🛒</div>
+                    <div class="step-label">加入購物車</div>
+                    <div class="step-desc">整套 / 單件</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-icon">💳</div>
+                    <div class="step-label">結帳付款</div>
+                    <div class="step-desc">線上/到店付</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-icon">🗺️</div>
+                    <div class="step-label">門市導航</div>
+                    <div class="step-desc">最短取貨路線</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-icon">⭐</div>
+                    <div class="step-label">評價回饋</div>
+                    <div class="step-desc">評分+分享穿搭</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 10: TECH ARCHITECTURE ==================== -->
+    <section class="slide" id="tech">
+        <div class="slide-inner">
+            <div class="slide-number">09 — 技術架構規劃</div>
+            <h2 class="slide-title">系統 <span class="gradient-text">技術棧</span></h2>
+            <p class="slide-subtitle">前後端分離架構，微服務部署，確保可擴展性與穩定性</p>
+            <div class="card-grid col3">
+                <div class="card">
+                    <div class="card-icon blue">🖥️</div>
+                    <h4>前端 Frontend</h4>
+                    <ul>
+                        <li>React / Next.js（Web）</li>
+                        <li>React Native / Flutter（App）</li>
+                        <li>WebGL / Three.js（3D 展示）</li>
+                        <li>Mapbox / Google Maps（LBS）</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-icon green">⚙️</div>
+                    <h4>後端 Backend</h4>
+                    <ul>
+                        <li>Node.js / Go（API Server）</li>
+                        <li>Python FastAPI（AI 服務）</li>
+                        <li>PostgreSQL + Redis（DB）</li>
+                        <li>Elasticsearch（搜尋引擎）</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-icon purple">🧠</div>
+                    <h4>AI / ML Pipeline</h4>
+                    <ul>
+                        <li>PyTorch（Try-On 模型）</li>
+                        <li>LLM Agent（穿搭推薦）</li>
+                        <li>CLIP / ViT（風格標記）</li>
+                        <li>GPU Cloud（推論運算）</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-icon amber">☁️</div>
+                    <h4>雲端基礎設施</h4>
+                    <ul>
+                        <li>AWS / GCP 雲端部署</li>
+                        <li>Docker + K8s（容器編排）</li>
+                        <li>CDN（圖片加速）</li>
+                        <li>CI/CD（自動化部署）</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-icon red">🔒</div>
+                    <h4>安全與金流</h4>
+                    <ul>
+                        <li>OAuth 2.0（身分驗證）</li>
+                        <li>綠界 / 藍新（金流串接）</li>
+                        <li>SSL/TLS 全站加密</li>
+                        <li>GDPR / 個資法合規</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-icon blue">📊</div>
+                    <h4>數據分析</h4>
+                    <ul>
+                        <li>Google Analytics（行為追蹤）</li>
+                        <li>Mixpanel（轉換漏斗）</li>
+                        <li>自建 BI Dashboard</li>
+                        <li>A/B Testing 框架</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 11: COST ANALYSIS ==================== -->
+    <section class="slide" id="cost">
+        <div class="slide-inner">
+            <div class="slide-number">10 — 成本分析</div>
+            <h2 class="slide-title">開發與營運 <span class="gradient-text">成本估算</span></h2>
+            <p class="slide-subtitle">從 MVP 到正式營運的完整成本結構，分階段投入降低風險</p>
+            <div class="two-col">
+                <div>
+                    <h3>🔧 開發成本（一次性）</h3>
+                    <div class="card">
+                        <div class="cost-row"><span class="cost-label">前端開發（Web + App）</span><span
+                                class="cost-value">NT$ 80 ~ 150 萬</span></div>
+                        <div class="cost-row"><span class="cost-label">後端 API + 資料庫</span><span class="cost-value">NT$
+                                60 ~ 120 萬</span></div>
+                        <div class="cost-row"><span class="cost-label">AI 模型開發 / 整合</span><span class="cost-value">NT$
+                                100 ~ 200 萬</span></div>
+                        <div class="cost-row"><span class="cost-label">虛擬試穿引擎</span><span class="cost-value">NT$ 80 ~
+                                180 萬</span></div>
+                        <div class="cost-row"><span class="cost-label">金流 / 地圖 / 第三方串接</span><span
+                                class="cost-value">NT$ 20 ~ 40 萬</span></div>
+                        <div class="cost-row"><span class="cost-label">UI/UX 設計</span><span class="cost-value">NT$ 30 ~
+                                60 萬</span></div>
+                        <div class="cost-total">
+                            <div class="cost-row"><span class="cost-label">MVP 開發總計</span><span class="cost-value"
+                                    style="color:var(--primary);">NT$ 370 ~ 750 萬</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>📆 月營運成本</h3>
+                    <div class="card">
+                        <div class="cost-row"><span class="cost-label">雲端主機 / GPU 算力</span><span class="cost-value">NT$
+                                3 ~ 8 萬/月</span></div>
+                        <div class="cost-row"><span class="cost-label">CDN + 儲存空間</span><span class="cost-value">NT$ 0.5
+                                ~ 2 萬/月</span></div>
+                        <div class="cost-row"><span class="cost-label">第三方API (地圖/金流)</span><span class="cost-value">NT$
+                                0.5 ~ 1.5 萬/月</span></div>
+                        <div class="cost-row"><span class="cost-label">客服 + 營運人力（2-3人）</span><span
+                                class="cost-value">NT$ 12 ~ 18 萬/月</span></div>
+                        <div class="cost-row"><span class="cost-label">行銷推廣費</span><span class="cost-value">NT$ 5 ~ 15
+                                萬/月</span></div>
+                        <div class="cost-row"><span class="cost-label">法務 / 會計 / 雜支</span><span class="cost-value">NT$ 2
+                                ~ 5 萬/月</span></div>
+                        <div class="cost-total">
+                            <div class="cost-row"><span class="cost-label">月營運總計</span><span class="cost-value"
+                                    style="color:var(--primary);">NT$ 23 ~ 50 萬/月</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="highlight-box" style="margin-top:24px;">
+                <h4>📈 損益兩平估算</h4>
+                <p style="font-size:14px;color:var(--text-secondary);">
+                    假設月營運 NT$ 35 萬，月租商家平均 NT$ 3,000，抽傭平均 8%，客單價 NT$ 1,200：<br>
+                    <strong>純月租模式</strong>：需 <strong>~117 家</strong> 月租商家達到損益兩平<br>
+                    <strong>純抽傭模式</strong>：需月交易額 <strong>~NT$ 437 萬</strong>（約 3,646 筆訂單）達到損益兩平<br>
+                    <strong>混合模式</strong>：50 家月租商家 + 月交易額 NT$ 218 萬 即可持平
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 12: RISK ANALYSIS ==================== -->
+    <section class="slide" id="risk">
+        <div class="slide-inner">
+            <div class="slide-number">11 — 風險評估與對策</div>
+            <h2 class="slide-title">潛在風險 <span class="gradient-text">應對策略</span></h2>
+            <p class="slide-subtitle">預先辨識可能遭遇的挑戰，制定完備的風險緩解計畫</p>
+            <div class="two-col">
+                <div>
+                    <h3>⚠️ 技術風險</h3>
+                    <div class="card" style="margin-bottom:20px;">
+                        <div class="risk-item">
+                            <span class="risk-level high">高</span>
+                            <div>
+                                <strong>試穿效果不佳</strong>
+                                <p>AI 生成的試穿圖可能失真，影響用戶信任。<br>
+                                    <span class="tag green">對策</span> 初期採用較成熟的開源模型，以半身試穿為主；持續收集數據優化模型品質。
+                                </p>
+                            </div>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-level mid">中</span>
+                            <div>
+                                <strong>AI 推薦偏誤</strong>
+                                <p>穿搭推薦可能不符合用戶預期或存在審美偏差。<br>
+                                    <span class="tag green">對策</span> 加入人工審核機制，建立風格回饋迴路，持續微調推薦模型。
+                                </p>
+                            </div>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-level mid">中</span>
+                            <div>
+                                <strong>GPU 算力成本過高</strong>
+                                <p>大量用戶同時試穿可能導致推論成本飆升。<br>
+                                    <span class="tag green">對策</span> 採用模型壓縮、批次推論、結果快取等方式降低單次成本。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <h3>📋 法規風險</h3>
+                    <div class="card">
+                        <div class="risk-item">
+                            <span class="risk-level high">高</span>
+                            <div>
+                                <strong>代購法規合規</strong>
+                                <p>代購可能涉及商標侵權、平行輸入、進口法規。<br>
+                                    <span class="tag green">對策</span> 聘請專業法律顧問；初期以合法品牌授權與選品代購為主；明確標示商品來源。
+                                </p>
+                            </div>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-level mid">中</span>
+                            <div>
+                                <strong>個資保護法</strong>
+                                <p>收集用戶照片、體型數據涉及個資法。<br>
+                                    <span class="tag green">對策</span> 嚴格遵循《個人資料保護法》；明確告知收集目的；提供資料刪除機制。
+                                </p>
+                            </div>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-level low">低</span>
+                            <div>
+                                <strong>電商稅務</strong>
+                                <p>平台需處理營業稅、發票開立。<br>
+                                    <span class="tag green">對策</span> 與專業會計事務所合作，導入電子發票系統。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>💼 商業風險</h3>
+                    <div class="card" style="margin-bottom:20px;">
+                        <div class="risk-item">
+                            <span class="risk-level high">高</span>
+                            <div>
+                                <strong>商家招募困難</strong>
+                                <p>初期平台缺乏用戶，商家缺乏入駐動力。<br>
+                                    <span class="tag green">對策</span> 提供首年免月租優惠；主動協助商品建模；在地化 BD 團隊逐區突破。
+                                </p>
+                            </div>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-level high">高</span>
+                            <div>
+                                <strong>冷啟動問題</strong>
+                                <p>雙邊平台的「雞生蛋蛋生雞」問題。<br>
+                                    <span class="tag green">對策</span> 先聚焦單一城市（如台南）；先累積 30+ 商家再開放用戶端；搭配社群行銷引流。
+                                </p>
+                            </div>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-level mid">中</span>
+                            <div>
+                                <strong>競爭者進入</strong>
+                                <p>大型電商可能快速複製此模式。<br>
+                                    <span class="tag green">對策</span> 深耕在地化服務與社群黏性；快速迭代；建立商家忠誠度。
+                                </p>
+                            </div>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-level mid">中</span>
+                            <div>
+                                <strong>代購供應鏈風險</strong>
+                                <p>海外採購可能遇到缺貨、品質不穩、物流延誤。<br>
+                                    <span class="tag green">對策</span> 建立多元供應商體系；設定安全庫存水位；明確退換貨政策。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <h3>🏢 代理權注意事項</h3>
+                    <div class="highlight-box amber">
+                        <ul style="font-size:14px;color:var(--text-secondary);">
+                            <li><strong>品牌代理合約</strong>：需確認獨家/非獨家、區域限制、最低採購量</li>
+                            <li><strong>平行輸入</strong>：台灣法律允許，但品牌可能限制</li>
+                            <li><strong>商標授權</strong>：使用品牌 Logo 行銷需取得書面授權</li>
+                            <li><strong>進口合規</strong>：紡織品需符合 CNS 標準、標示法規</li>
+                            <li><strong>關稅</strong>：服飾進口關稅約 10-12.5%，需納入成本計算</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 13: COMPETITIVE ANALYSIS ==================== -->
+    <section class="slide" id="compete">
+        <div class="slide-inner">
+            <div class="slide-number">12 — 競爭優勢分析</div>
+            <h2 class="slide-title">市場定位與 <span class="gradient-text">差異化優勢</span></h2>
+            <p class="slide-subtitle">對比現有解決方案，StyleHub 的綜合整合優勢無人能及</p>
+            <div class="card" style="margin-bottom:32px;">
+                <table class="styled-table">
+                    <tr>
+                        <th>能力維度</th>
+                        <th>蝦皮/MOMO</th>
+                        <th>ZARA/H&M App</th>
+                        <th>穿搭 IG 網紅</th>
+                        <th style="background:var(--primary-dark);">StyleHub ✨</th>
+                    </tr>
+                    <tr>
+                        <td><strong>虛擬試穿</strong></td>
+                        <td>❌</td>
+                        <td>部分（AR）</td>
+                        <td>❌</td>
+                        <td>✅ AI 全身</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AI 穿搭推薦</strong></td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>人工推薦</td>
+                        <td>✅ AI Agent</td>
+                    </tr>
+                    <tr>
+                        <td><strong>在地商家整合</strong></td>
+                        <td>❌</td>
+                        <td>自有品牌</td>
+                        <td>❌</td>
+                        <td>✅ 多商家 LBS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>代購整合</strong></td>
+                        <td>部分</td>
+                        <td>❌</td>
+                        <td>個人代購</td>
+                        <td>✅ 系統化</td>
+                    </tr>
+                    <tr>
+                        <td><strong>好評排序</strong></td>
+                        <td>有</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>✅ AI 權重排序</td>
+                    </tr>
+                    <tr>
+                        <td><strong>最少店家路線</strong></td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>✅ 獨創演算法</td>
+                    </tr>
+                    <tr>
+                        <td><strong>門市導航</strong></td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>✅ 整合地圖</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="card-grid col3">
+                <div class="card" style="border-top:4px solid var(--primary);text-align:center;">
+                    <div style="font-size:36px;margin-bottom:12px;">🎯</div>
+                    <h4>核心壁壘</h4>
+                    <p>虛擬試穿 + AI 推薦的技術整合門檻高，競爭者難以短期複製完整體驗。</p>
+                </div>
+                <div class="card" style="border-top:4px solid var(--purple);text-align:center;">
+                    <div style="font-size:36px;margin-bottom:12px;">🌐</div>
+                    <h4>網路效應</h4>
+                    <p>商家越多 → 推薦越準 → 用戶越多 → 商家越願意入駐，形成正向飛輪效應。</p>
+                </div>
+                <div class="card" style="border-top:4px solid var(--accent);text-align:center;">
+                    <div style="font-size:36px;margin-bottom:12px;">📍</div>
+                    <h4>在地深耕</h4>
+                    <p>LBS + 在地商家合作模式，需要逐區建立關係，大平台難以快速複製。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 14: ROADMAP ==================== -->
+    <section class="slide" id="roadmap">
+        <div class="slide-inner">
+            <div class="slide-number">13 — 發展路線圖</div>
+            <h2 class="slide-title">分階段 <span class="gradient-text">開發路線</span></h2>
+            <p class="slide-subtitle">以 MVP 快速驗證，逐步擴展功能與市場覆蓋</p>
+            <div class="two-col">
+                <div>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-phase">PHASE 1 — 第 1~3 個月</div>
+                            <div class="timeline-title">🏗️ MVP 開發與驗證</div>
+                            <div class="timeline-desc">
+                                <ul style="font-size:14px;color:var(--text-secondary);">
+                                    <li>完成核心虛擬試穿功能 (Web 版)</li>
+                                    <li>商家後台基本商品上傳與管理</li>
+                                    <li>基礎 AI 穿搭推薦 (規則式+簡單 ML)</li>
+                                    <li>招募 10~20 家台南在地商家測試</li>
+                                    <li>小規模 Beta 測試（100 位用戶）</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-phase">PHASE 2 — 第 4~6 個月</div>
+                            <div class="timeline-title">📈 功能完善與拓展</div>
+                            <div class="timeline-desc">
+                                <ul style="font-size:14px;color:var(--text-secondary);">
+                                    <li>優化試穿品質，支援更多服飾品類</li>
+                                    <li>上線 LBS 地理圍欄搜尋功能</li>
+                                    <li>好評制度與商家排名系統</li>
+                                    <li>金流串接（綠界/藍新）</li>
+                                    <li>商家拓展至 50+ 家</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-phase">PHASE 3 — 第 7~12 個月</div>
+                            <div class="timeline-title">🚀 代購整合與 App 上線</div>
+                            <div class="timeline-desc">
+                                <ul style="font-size:14px;color:var(--text-secondary);">
+                                    <li>整合代購/寄賣功能</li>
+                                    <li>推出 iOS / Android App</li>
+                                    <li>進階 AI Agent（LLM 驅動對話式推薦）</li>
+                                    <li>拓展至高雄、台中等城市</li>
+                                    <li>目標 100+ 商家、5,000+ 活躍用戶</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-phase">PHASE 4 — 第 13~18 個月</div>
+                            <div class="timeline-title">🌟 規模化與變現加速</div>
+                            <div class="timeline-desc">
+                                <ul style="font-size:14px;color:var(--text-secondary);">
+                                    <li>全台主要城市覆蓋</li>
+                                    <li>引入品牌合作與廣告營收</li>
+                                    <li>建立代購品牌代理體系</li>
+                                    <li>社群功能（穿搭分享、KOL 互動）</li>
+                                    <li>目標損益兩平，籌備 A 輪融資</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>🎯 階段性 KPI</h3>
+                    <div class="card" style="margin-bottom:20px;">
+                        <table class="styled-table">
+                            <tr>
+                                <th>指標</th>
+                                <th>Phase 1</th>
+                                <th>Phase 2</th>
+                                <th>Phase 3</th>
+                                <th>Phase 4</th>
+                            </tr>
+                            <tr>
+                                <td>合作商家</td>
+                                <td>20</td>
+                                <td>50</td>
+                                <td>150</td>
+                                <td>500+</td>
+                            </tr>
+                            <tr>
+                                <td>上架商品</td>
+                                <td>500</td>
+                                <td>3,000</td>
+                                <td>15,000</td>
+                                <td>50,000+</td>
+                            </tr>
+                            <tr>
+                                <td>註冊用戶</td>
+                                <td>500</td>
+                                <td>3,000</td>
+                                <td>15,000</td>
+                                <td>80,000+</td>
+                            </tr>
+                            <tr>
+                                <td>月活用戶</td>
+                                <td>100</td>
+                                <td>800</td>
+                                <td>5,000</td>
+                                <td>30,000+</td>
+                            </tr>
+                            <tr>
+                                <td>月交易額</td>
+                                <td>10 萬</td>
+                                <td>80 萬</td>
+                                <td>300 萬</td>
+                                <td>1,000 萬+</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <h3>💰 資金需求規劃</h3>
+                    <div class="card">
+                        <div class="cost-row"><span class="cost-label">種子輪（Phase 1-2）</span><span class="cost-value">NT$
+                                300 ~ 500 萬</span></div>
+                        <div class="cost-row"><span class="cost-label">天使輪（Phase 3）</span><span class="cost-value">NT$
+                                800 ~ 1,500 萬</span></div>
+                        <div class="cost-row"><span class="cost-label">Pre-A 輪（Phase 4）</span><span
+                                class="cost-value">NT$ 3,000 ~ 5,000 萬</span></div>
+                        <p style="font-size:13px;color:var(--text-light);margin-top:16px;">
+                            * 亦可考慮政府補助：<br>
+                            — SBIR 小型企業創新研發計畫<br>
+                            — SIIR 服務業創新研發計畫<br>
+                            — 青年創業貸款<br>
+                            — 國發基金天使投資
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 15: ACTION ITEMS ==================== -->
+    <section class="slide" id="todo">
+        <div class="slide-inner">
+            <div class="slide-number">14 — 待辦事項清單</div>
+            <h2 class="slide-title">立即行動 <span class="gradient-text">To-Do List</span></h2>
+            <p class="slide-subtitle">按優先級排列的具體行動項目，確保團隊同步推進</p>
+            <div class="three-col">
+                <div>
+                    <h3>🔴 立即執行（0~1 個月）</h3>
+                    <div class="card" style="border-left:4px solid var(--danger);">
+                        <ul>
+                            <li>✅ 完成商業計畫書定稿並組建核心團隊</li>
+                            <li>⬜ 調研並選定虛擬試穿技術方案（開源 vs API vs 自研）</li>
+                            <li>⬜ 法律顧問諮詢：代購合規、個資法、公司設立</li>
+                            <li>⬜ 註冊公司 / 行號，申請營業登記</li>
+                            <li>⬜ 設計 MVP 功能規格書與 UI/UX 線框圖</li>
+                            <li>⬜ 開始接觸台南在地商家，評估合作意願</li>
+                            <li>⬜ 申請 SBIR / SIIR 等政府補助計畫</li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <h3>🟡 短期目標（1~3 個月）</h3>
+                    <div class="card" style="border-left:4px solid var(--accent);">
+                        <ul>
+                            <li>⬜ MVP 前端開發啟動</li>
+                            <li>⬜ 虛擬試穿引擎 POC（概念驗證）</li>
+                            <li>⬜ 後端 API 核心架構開發</li>
+                            <li>⬜ 商家後台基本功能開發</li>
+                            <li>⬜ AI 穿搭推薦 V1（規則式 + 基礎ML）</li>
+                            <li>⬜ 簽約首批 10~20 家合作商家</li>
+                            <li>⬜ 建模流程標準化（拍攝 SOP）</li>
+                            <li>⬜ Beta 測試計畫制定</li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <h3>🟢 中期目標（3~6 個月）</h3>
+                    <div class="card" style="border-left:4px solid var(--success);">
+                        <ul>
+                            <li>⬜ MVP 上線 Beta 測試</li>
+                            <li>⬜ 收集用戶回饋，迭代優化</li>
+                            <li>⬜ LBS 地理搜尋功能上線</li>
+                            <li>⬜ 好評制度 & 商家排名系統上線</li>
+                            <li>⬜ 金流串接完成</li>
+                            <li>⬜ 代購模組需求分析與設計</li>
+                            <li>⬜ 商家拓展 BD 策略執行</li>
+                            <li>⬜ 行銷推廣計畫啟動</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="highlight-box" style="margin-top:32px;">
+                <h4>👥 核心團隊配置建議（初創期 5~7 人）</h4>
+                <div class="card-grid col4" style="margin-top:16px;">
+                    <div style="text-align:center;">
+                        <div style="font-size:28px;">👨‍💻</div>
+                        <strong style="font-size:14px;">全端工程師</strong>
+                        <p style="font-size:12px;color:var(--text-light);">×2 前後端開發</p>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:28px;">🤖</div>
+                        <strong style="font-size:14px;">AI 工程師</strong>
+                        <p style="font-size:12px;color:var(--text-light);">×1 模型開發整合</p>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:28px;">🎨</div>
+                        <strong style="font-size:14px;">UI/UX 設計師</strong>
+                        <p style="font-size:12px;color:var(--text-light);">×1 產品設計</p>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:28px;">📣</div>
+                        <strong style="font-size:14px;">BD / 行銷</strong>
+                        <p style="font-size:12px;color:var(--text-light);">×1~2 商家開發行銷</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 16: CLOSING ==================== -->
+    <section class="slide" id="closing" style="background:linear-gradient(160deg,#F8FAFC 0%,#EFF6FF 40%,#F5F3FF 100%);">
+        <div class="slide-inner" style="text-align:center;">
+            <div class="slide-number">結語</div>
+            <h2 class="slide-title" style="font-size:48px;">
+                讓科技重新定義<br><span class="gradient-text">穿搭體驗</span>
+            </h2>
+            <p class="slide-subtitle" style="max-width:700px;margin:20px auto 40px;">
+                StyleHub 不只是一個電商平台，而是一個融合 AI 智能、虛擬實境、在地服務與全球代購的<br>
+                <strong>次世代服飾消費生態系統</strong>
+            </p>
+            <div class="card-grid col4" style="max-width:900px;margin:0 auto 40px;">
+                <div style="text-align:center;">
+                    <div style="font-size:40px;">👗</div>
+                    <strong>虛擬試穿</strong>
+                    <p style="font-size:12px;color:var(--text-light);">降低退貨率</p>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-size:40px;">🤖</div>
+                    <strong>AI 穿搭</strong>
+                    <p style="font-size:12px;color:var(--text-light);">個人化推薦</p>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-size:40px;">📍</div>
+                    <strong>在地服務</strong>
+                    <p style="font-size:12px;color:var(--text-light);">LBS 精準推薦</p>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-size:40px;">🌏</div>
+                    <strong>代購通路</strong>
+                    <p style="font-size:12px;color:var(--text-light);">全球好物直送</p>
+                </div>
+            </div>
+            <div style="margin-top:40px;">
+                <p style="font-size:16px;color:var(--text-secondary);margin-bottom:8px;">感謝您的聆聽</p>
+                <p style="font-size:28px;font-weight:800;"><span class="gradient-text">Let's Build the Future of Fashion
+                        Together</span></p>
+                <p style="font-size:14px;color:var(--text-light);margin-top:24px;">StyleHub 商業計畫書 — 2026 年 2 月</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SIMPLE NAV HIGHLIGHT SCRIPT -->
+    <script>
+        document.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.slide[id]');
+            const links = document.querySelectorAll('.nav-links a');
+            let current = '';
+            sections.forEach(s => { if (scrollY >= s.offsetTop - 200) current = s.id; });
+            links.forEach(l => { l.classList.toggle('active', l.getAttribute('href') === '#' + current); });
+        });
+    </script>
+</body>
+
+</html>

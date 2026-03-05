@@ -26,6 +26,16 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname)));
 
+// --- Admin Panel ---
+app.use('/admin', express.static(path.join(__dirname, 'admin')));
+
+// --- API Routes: Merchant, Product, Order, AI Agent ---
+app.use('/api/merchants', require('./src/routes/merchants'));
+app.use('/api/products', require('./src/routes/products'));
+app.use('/api/categories', require('./src/routes/categories'));
+app.use('/api/orders', require('./src/routes/orders'));
+app.use('/api/ai-agents', require('./src/routes/ai-agent'));
+
 // --- Helper: Get GCloud Access Token ---
 function getAccessToken() {
   // Try multiple possible gcloud paths

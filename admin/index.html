@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClosetSwipe Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span class="logo-icon">&#x1F457;</span>
+        <span>ClosetSwipe</span>
+        <small>Admin</small>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-page="dashboard">
+          <span class="nav-icon">&#x1F4CA;</span> Dashboard
+        </a>
+        <a href="#" class="nav-item" data-page="merchants">
+          <span class="nav-icon">&#x1F3EA;</span> Merchants
+        </a>
+        <a href="#" class="nav-item" data-page="products">
+          <span class="nav-icon">&#x1F455;</span> Products
+        </a>
+        <a href="#" class="nav-item" data-page="orders">
+          <span class="nav-icon">&#x1F4E6;</span> Orders
+        </a>
+        <a href="#" class="nav-item" data-page="agents">
+          <span class="nav-icon">&#x1F916;</span> AI Agents
+        </a>
+        <a href="#" class="nav-item" data-page="tryon">
+          <span class="nav-icon">&#x2728;</span> Try-On Sessions
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="/" class="nav-item">
+          <span class="nav-icon">&#x2190;</span> Back to Store
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <header class="admin-header">
+        <h1 id="pageTitle">Dashboard</h1>
+        <div class="header-actions" id="headerActions"></div>
+      </header>
+
+      <div class="admin-content" id="pageContent">
+        <!-- Dynamic content loaded here -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Modal</h2>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer" id="modalFooter"></div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

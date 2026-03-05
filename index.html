@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClosetSwipe — AI 虛擬試穿</title>
+    <title>StyleHub — AI 虛擬試穿平台</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
@@ -13,7 +13,7 @@
     <header class="app-header">
         <div class="logo">
             <span class="logo-icon">👗</span>
-            <span class="logo-text">ClosetSwipe</span>
+            <span class="logo-text">StyleHub</span>
         </div>
         <div class="header-center">
             <button class="mode-btn active" id="btnModePhoto" onclick="setMode('photo')">
@@ -30,6 +30,9 @@
                 <span id="autoIcon">▶</span> 自動展示
             </button>
             <button class="btn-ai-tryon" id="btnAiTryon" onclick="tryOnWithAI()">✨ 全身試穿</button>
+            <button class="btn-save-outfit" id="btnSaveOutfit" onclick="saveOutfit()">💾 儲存搭配</button>
+            <button class="btn-auth" id="btnAuth" onclick="showAuthModal()">Login</button>
+            <a href="/merchant.html" class="btn-merchant-link">商家入口</a>
         </div>
     </header>
 
@@ -194,6 +197,50 @@
         <span>↑ ↓ 下著</span>
         <span>S 鞋款</span>
         <span>Space 自動</span>
+    </div>
+
+    <!-- AUTH MODAL -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-content auth-modal-content">
+            <button class="modal-close" onclick="closeAuthModal()">✕</button>
+            <div class="modal-header"><h2>StyleHub</h2></div>
+            <div class="modal-body">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="switchAuthTab('login')">登入</button>
+                    <button class="auth-tab" onclick="switchAuthTab('register')">註冊</button>
+                </div>
+                <div class="auth-error" id="authError" style="display:none"></div>
+                <div id="authLoginForm">
+                    <div class="auth-field">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" placeholder="your@email.com">
+                    </div>
+                    <div class="auth-field">
+                        <label>密碼</label>
+                        <input type="password" id="loginPassword" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+                    </div>
+                    <button class="auth-submit" onclick="doLogin()">登入</button>
+                </div>
+                <div id="authRegisterForm" style="display:none">
+                    <div class="auth-field">
+                        <label>顯示名稱</label>
+                        <input type="text" id="regName" placeholder="Your Name">
+                    </div>
+                    <div class="auth-field">
+                        <label>Email</label>
+                        <input type="email" id="regEmail" placeholder="your@email.com">
+                    </div>
+                    <div class="auth-field">
+                        <label>密碼</label>
+                        <input type="password" id="regPassword" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doRegister()">
+                    </div>
+                    <button class="auth-submit" onclick="doRegister()">註冊</button>
+                </div>
+                <div class="auth-demo-hint">
+                    Demo: user@demo.com / user1234
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>

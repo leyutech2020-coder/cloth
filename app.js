@@ -1,7 +1,177 @@
-/* ===== ClosetSwipe v5 — Static AI Try-on + Chat Adjustment ===== */
+/* ===== StyleHub v6 — AI Virtual Try-On Platform ===== */
+
+// ===================== AUTH STATE =====================
+let authToken = localStorage.getItem('stylehub_token');
+let currentUser = null;
+
+function getAuthHeaders() {
+  return authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
+}
+
+async function checkAuth() {
+  if (!authToken) return;
+  try {
+    const res = await fetch('/api/auth/me', { headers: getAuthHeaders() });
+    if (res.ok) {
+      currentUser = await res.json();
+      updateAuthUI();
+    } else {
+      authToken = null;
+      localStorage.removeItem('stylehub_token');
+    }
+  } catch { /* ignore */ }
+}
+
+function updateAuthUI() {
+  const authBtn = document.getElementById('btnAuth');
+  const favBtn = document.getElementById('btnFavorites');
+  if (currentUser) {
+    authBtn.textContent = currentUser.display_name || currentUser.name || 'Account';
+    authBtn.onclick = showAccountMenu;
+    if (favBtn) favBtn.style.display = 'inline-flex';
+  } else {
+    authBtn.textContent = 'Login';
+    authBtn.onclick = showAuthModal;
+    if (favBtn) favBtn.style.display = 'none';
+  }
+}
+
+function showAuthModal() {
+  document.getElementById('authModal').classList.add('active');
+  document.getElementById('authError').style.display = 'none';
+}
+
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('active');
+}
+
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.auth-tab[onclick*="${tab}"]`).classList.add('active');
+  document.getElementById('authLoginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('authRegisterForm').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('authError').style.display = 'none';
+}
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    authToken = data.token;
+    localStorage.setItem('stylehub_token', authToken);
+    currentUser = { ...data.user, role: 'user' };
+    updateAuthUI();
+    closeAuthModal();
+  } catch (e) {
+    document.getElementById('authError').textContent = e.message;
+    document.getElementById('authError').style.display = 'block';
+  }
+}
+
+async function doRegister() {
+  const email = document.getElementById('regEmail').value;
+  const password = document.getElementById('regPassword').value;
+  const displayName = document.getElementById('regName').value;
+  try {
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, displayName })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    authToken = data.token;
+    localStorage.setItem('stylehub_token', authToken);
+    currentUser = { ...data.user, role: 'user' };
+    updateAuthUI();
+    closeAuthModal();
+  } catch (e) {
+    document.getElementById('authError').textContent = e.message;
+    document.getElementById('authError').style.display = 'block';
+  }
+}
+
+function showAccountMenu() {
+  if (confirm('Logout?')) {
+    authToken = null;
+    currentUser = null;
+    localStorage.removeItem('stylehub_token');
+    updateAuthUI();
+  }
+}
+
+// ===================== FAVORITES =====================
+async function toggleFavorite(productId) {
+  if (!authToken) { showAuthModal(); return; }
+  try {
+    const existing = userFavorites.has(productId);
+    if (existing) {
+      await fetch(`/api/favorites/${productId}`, { method: 'DELETE', headers: getAuthHeaders() });
+      userFavorites.delete(productId);
+    } else {
+      await fetch('/api/favorites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify({ productId })
+      });
+      userFavorites.add(productId);
+    }
+    renderCarousels();
+  } catch { /* ignore */ }
+}
+
+let userFavorites = new Set();
+async function loadFavorites() {
+  if (!authToken) return;
+  try {
+    const res = await fetch('/api/favorites', { headers: getAuthHeaders() });
+    if (res.ok) {
+      const data = await res.json();
+      userFavorites = new Set(data.favorites.map(f => f.id));
+    }
+  } catch { /* ignore */ }
+}
+
+// ===================== SAVE OUTFIT =====================
+async function saveOutfit() {
+  if (!authToken) { showAuthModal(); return; }
+  const top = CLOTHING.tops[currentIndex.tops];
+  const bottom = CLOTHING.bottoms[currentIndex.bottoms];
+  const shoe = CLOTHING.shoes[currentIndex.shoes];
+  const lastResult = aiResultImages.length > 0 ? aiResultImages[aiResultImages.length - 1] : null;
+
+  try {
+    await fetch('/api/outfits', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+      body: JSON.stringify({
+        name: `${top.name} + ${bottom.name} + ${shoe.name}`,
+        topId: top.id,
+        bottomId: bottom.id,
+        shoeId: shoe.id,
+        resultImage: lastResult ? `data:${lastResult.mimeType};base64,${lastResult.image}` : null,
+      })
+    });
+    alert('Outfit saved!');
+  } catch { alert('Failed to save outfit'); }
+}
 
 // ===================== CLOTHING DATA =====================
-const CLOTHING = {
+let CLOTHING = {
+  tops: [],
+  bottoms: [],
+  shoes: [],
+};
+
+// Fallback data in case API is unavailable
+const FALLBACK_CLOTHING = {
   tops: [
     { name: '白色 T-shirt', img: 'images/tops/white_tee.jpg', price: '$890' },
     { name: '條紋襯衫', img: 'images/tops/striped_shirt.jpg', price: '$1,290' },
@@ -22,6 +192,38 @@ const CLOTHING = {
     { name: '棕色牛津鞋', img: 'images/shoes/brown_oxford.jpg', price: '$3,890' },
   ]
 };
+
+async function loadProductsFromAPI() {
+  try {
+    const res = await fetch('/api/products?limit=100');
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+
+    const grouped = { tops: [], bottoms: [], shoes: [] };
+    for (const p of data.products) {
+      if (grouped[p.category]) {
+        grouped[p.category].push({
+          id: p.id,
+          name: p.name,
+          img: p.image_url,
+          price: `$${p.price.toLocaleString()}`,
+          rawPrice: p.price,
+          merchantId: p.merchant_id,
+          merchantName: p.merchant_name,
+          sizes: p.sizes,
+          colors: p.colors,
+        });
+      }
+    }
+
+    if (grouped.tops.length > 0) CLOTHING.tops = grouped.tops;
+    if (grouped.bottoms.length > 0) CLOTHING.bottoms = grouped.bottoms;
+    if (grouped.shoes.length > 0) CLOTHING.shoes = grouped.shoes;
+  } catch {
+    // Fall back to hardcoded data
+    CLOTHING = JSON.parse(JSON.stringify(FALLBACK_CLOTHING));
+  }
+}
 
 // ===================== STATE =====================
 let currentIndex = { tops: 0, bottoms: 0, shoes: 0 };
@@ -48,7 +250,10 @@ let bgPregenRunning = false;
 let adjustHistory = [];
 
 // ===================== INIT =====================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadProductsFromAPI();
+  await checkAuth();
+  await loadFavorites();
   renderCarousels();
   setupPhotoUpload();
   setupKeyboard();
@@ -56,6 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupDragDrop();
   setupCompareSlider();
   useDefaultModel();
+  updateAuthUI();
 });
 
 // ===================== PRELOAD =====================
@@ -195,6 +401,7 @@ function renderCarousel(category) {
          onclick="selectItem('${category}', ${i})">
       <img src="${item.img}" alt="${item.name}">
       <div class="item-name">${item.name}</div>
+      ${item.id ? `<button class="fav-btn ${userFavorites.has(item.id) ? 'active' : ''}" onclick="event.stopPropagation();toggleFavorite('${item.id}')" title="Favorite">&hearts;</button>` : ''}
     </div>
   `).join('');
   updateOutfitInfo();
@@ -217,9 +424,10 @@ function updateOutfitInfo() {
   const top = CLOTHING.tops[currentIndex.tops];
   const bottom = CLOTHING.bottoms[currentIndex.bottoms];
   const shoe = CLOTHING.shoes[currentIndex.shoes];
+  if (!top || !bottom || !shoe) return;
   document.getElementById('outfitItems').textContent = `${top.name} + ${bottom.name} + ${shoe.name}`;
-  const total = [top.price, bottom.price, shoe.price]
-    .map(p => parseInt(p.replace(/[$,]/g, '')))
+  const total = [top, bottom, shoe]
+    .map(p => p.rawPrice || parseInt(String(p.price).replace(/[$,]/g, '')))
     .reduce((a, b) => a + b, 0);
   document.getElementById('outfitTotal').textContent = `$${total.toLocaleString()}`;
 }

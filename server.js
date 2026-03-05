@@ -1,5 +1,5 @@
 /**
- * ClosetSwipe — Vertex AI Virtual Try-On Proxy Server
+ * StyleHub — AI Virtual Try-On Platform Server
  * 
  * Usage:
  *   1. npm install
@@ -12,6 +12,7 @@ const express = require('express');
 const cors = require('cors');
 const { execSync } = require('child_process');
 const path = require('path');
+const db = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -29,12 +30,17 @@ app.use(express.static(path.join(__dirname)));
 // --- Admin Panel ---
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
-// --- API Routes: Merchant, Product, Order, AI Agent ---
+// --- API Routes: Admin (from src/) ---
 app.use('/api/merchants', require('./src/routes/merchants'));
 app.use('/api/products', require('./src/routes/products'));
 app.use('/api/categories', require('./src/routes/categories'));
 app.use('/api/orders', require('./src/routes/orders'));
 app.use('/api/ai-agents', require('./src/routes/ai-agent'));
+
+// --- API Routes: Auth & User Features ---
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/favorites', require('./routes/favorites'));
+app.use('/api/outfits', require('./routes/favorites'));
 
 // --- Helper: Get GCloud Access Token ---
 function getAccessToken() {
@@ -217,15 +223,22 @@ app.get('/api/health', (req, res) => {
   let gcpOk = false;
   try { getAccessToken(); gcpOk = true; } catch (_) {}
 
+  const counts = {
+    merchants: db.prepare('SELECT COUNT(*) as c FROM merchants').get().c,
+    products: db.prepare('SELECT COUNT(*) as c FROM products WHERE is_active = 1').get().c,
+    users: db.prepare('SELECT COUNT(*) as c FROM users').get().c,
+  };
+
   res.json({
     status: 'ok',
-    gcp: { authenticated: gcpOk, project: GCP_PROJECT_ID, region: GCP_REGION, model: MODEL_ID }
+    gcp: { authenticated: gcpOk, project: GCP_PROJECT_ID, region: GCP_REGION, model: MODEL_ID },
+    database: counts
   });
 });
 
 // --- Start ---
 app.listen(PORT, () => {
-  console.log(`\n🎨 ClosetSwipe server at http://localhost:${PORT}\n`);
+  console.log(`\n🎨 StyleHub server at http://localhost:${PORT}\n`);
   console.log(`   Project: ${GCP_PROJECT_ID} | Region: ${GCP_REGION} | Model: ${MODEL_ID}\n`);
   if (GCP_PROJECT_ID === 'YOUR_PROJECT_ID') {
     console.log('   ⚠️  Set GCP_PROJECT_ID: GCP_PROJECT_ID=my-project node server.js\n');

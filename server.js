@@ -1,6 +1,6 @@
 /**
- * ClosetSwipe — Vertex AI Virtual Try-On Proxy Server
- * 
+ * StyleHub — Virtual Try-On x AI Styling x Local Stores
+ *
  * Usage:
  *   1. npm install
  *   2. gcloud auth login
@@ -212,6 +212,30 @@ app.post('/api/adjust', async (req, res) => {
   }
 });
 
+// --- GET /api/stores — Mock store data with LBS filtering ---
+app.get('/api/stores', (req, res) => {
+  const radius = parseFloat(req.query.radius) || 3;
+  const category = req.query.category || 'all';
+
+  const stores = [
+    { id: 1, name: 'Urban Style Co.', category: 'streetwear', rating: 4.8, reviews: 342, distance: 0.5, items: 128, styles: ['Street', 'Casual'], address: 'No. 45, Zhongshan Rd' },
+    { id: 2, name: 'Classic Gentleman', category: 'formal', rating: 4.9, reviews: 215, distance: 0.8, items: 86, styles: ['Formal', 'Business'], address: 'No. 12, Minsheng Rd' },
+    { id: 3, name: 'Seoul Fashion', category: 'korean', rating: 4.7, reviews: 567, distance: 1.2, items: 234, styles: ['Korean', 'Casual'], address: 'No. 78, Ximen Rd' },
+    { id: 4, name: 'Tokyo Drift Wear', category: 'japanese', rating: 4.6, reviews: 189, distance: 1.8, items: 156, styles: ['Japanese', 'Minimalist'], address: 'No. 33, Dongning Rd' },
+    { id: 5, name: 'Vintage Vault', category: 'vintage', rating: 4.5, reviews: 98, distance: 2.3, items: 67, styles: ['Vintage', 'Retro'], address: "No. 5, Hai'an Rd" },
+    { id: 6, name: 'Daily Basics', category: 'casual', rating: 4.4, reviews: 421, distance: 2.8, items: 312, styles: ['Casual', 'Basic'], address: 'No. 156, Chenggong Rd' },
+    { id: 7, name: 'Street Kings', category: 'streetwear', rating: 4.7, reviews: 278, distance: 3.5, items: 198, styles: ['Street', 'Hip-Hop'], address: 'No. 88, Beimen Rd' },
+    { id: 8, name: 'Minimalist Lab', category: 'casual', rating: 4.8, reviews: 156, distance: 4.2, items: 89, styles: ['Minimalist', 'Modern'], address: 'No. 22, Anping Rd' },
+  ];
+
+  let filtered = stores.filter(s => s.distance <= radius);
+  if (category !== 'all') {
+    filtered = filtered.filter(s => s.category === category);
+  }
+
+  res.json({ stores: filtered, total: filtered.length, radius });
+});
+
 // --- Health check ---
 app.get('/api/health', (req, res) => {
   let gcpOk = false;
@@ -225,7 +249,7 @@ app.get('/api/health', (req, res) => {
 
 // --- Start ---
 app.listen(PORT, () => {
-  console.log(`\n🎨 ClosetSwipe server at http://localhost:${PORT}\n`);
+  console.log(`\n StyleHub server at http://localhost:${PORT}\n`);
   console.log(`   Project: ${GCP_PROJECT_ID} | Region: ${GCP_REGION} | Model: ${MODEL_ID}\n`);
   if (GCP_PROJECT_ID === 'YOUR_PROJECT_ID') {
     console.log('   ⚠️  Set GCP_PROJECT_ID: GCP_PROJECT_ID=my-project node server.js\n');

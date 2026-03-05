@@ -1,7 +1,7 @@
 {
-  "name": "closetswipe-demo",
+  "name": "stylehub",
   "version": "1.0.0",
-  "description": "ClosetSwipe Virtual Try-On Demo with Google Vertex AI",
+  "description": "StyleHub — Virtual Try-On x AI Styling x Local Stores Platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

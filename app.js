@@ -1,27 +1,39 @@
-/* ===== ClosetSwipe v5 — Static AI Try-on + Chat Adjustment ===== */
+/* ===== StyleHub — Virtual Try-On x AI Styling x Local Stores ===== */
 
 // ===================== CLOTHING DATA =====================
 const CLOTHING = {
   tops: [
-    { name: '白色 T-shirt', img: 'images/tops/white_tee.jpg', price: '$890' },
-    { name: '條紋襯衫', img: 'images/tops/striped_shirt.jpg', price: '$1,290' },
-    { name: '黑色帽T', img: 'images/tops/black_hoodie.jpg', price: '$1,490' },
-    { name: '紅色法蘭絨', img: 'images/tops/red_flannel.jpg', price: '$1,690' },
-    { name: '海軍藍西裝外套', img: 'images/tops/navy_blazer.jpg', price: '$3,290' },
-    { name: '丹寧夾克', img: 'images/tops/denim_jacket.jpg', price: '$2,490' },
+    { name: 'White T-shirt', img: 'images/tops/white_tee.jpg', price: 890 },
+    { name: 'Striped Shirt', img: 'images/tops/striped_shirt.jpg', price: 1290 },
+    { name: 'Black Hoodie', img: 'images/tops/black_hoodie.jpg', price: 1490 },
+    { name: 'Red Flannel', img: 'images/tops/red_flannel.jpg', price: 1690 },
+    { name: 'Navy Blazer', img: 'images/tops/navy_blazer.jpg', price: 3290 },
+    { name: 'Denim Jacket', img: 'images/tops/denim_jacket.jpg', price: 2490 },
   ],
   bottoms: [
-    { name: '深藍牛仔褲', img: 'images/bottoms/blue_jeans.jpg', price: '$1,690' },
-    { name: '卡其休閒褲', img: 'images/bottoms/khaki_pants.jpg', price: '$1,290' },
-    { name: '黑色短裙', img: 'images/bottoms/black_skirt.jpg', price: '$1,890' },
-    { name: '慢跑褲', img: 'images/bottoms/joggers.jpg', price: '$990' },
+    { name: 'Blue Jeans', img: 'images/bottoms/blue_jeans.jpg', price: 1690 },
+    { name: 'Khaki Pants', img: 'images/bottoms/khaki_pants.jpg', price: 1290 },
+    { name: 'Black Skirt', img: 'images/bottoms/black_skirt.jpg', price: 1890 },
+    { name: 'Joggers', img: 'images/bottoms/joggers.jpg', price: 990 },
   ],
   shoes: [
-    { name: '白色運動鞋', img: 'images/shoes/white_sneakers.jpg', price: '$3,290' },
-    { name: '黑色靴子', img: 'images/shoes/black_boots.jpg', price: '$4,290' },
-    { name: '棕色牛津鞋', img: 'images/shoes/brown_oxford.jpg', price: '$3,890' },
+    { name: 'White Sneakers', img: 'images/shoes/white_sneakers.jpg', price: 3290 },
+    { name: 'Black Boots', img: 'images/shoes/black_boots.jpg', price: 4290 },
+    { name: 'Brown Oxford', img: 'images/shoes/brown_oxford.jpg', price: 3890 },
   ]
 };
+
+// ===================== MOCK STORE DATA =====================
+const STORES = [
+  { id: 1, name: 'Urban Style Co.', category: 'streetwear', rating: 4.8, reviews: 342, distance: 0.5, lat: 22.997, lng: 120.213, items: 128, styles: ['Street', 'Casual'], address: 'No. 45, Zhongshan Rd' },
+  { id: 2, name: 'Classic Gentleman', category: 'formal', rating: 4.9, reviews: 215, distance: 0.8, lat: 22.994, lng: 120.207, items: 86, styles: ['Formal', 'Business'], address: 'No. 12, Minsheng Rd' },
+  { id: 3, name: 'Seoul Fashion', category: 'korean', rating: 4.7, reviews: 567, distance: 1.2, lat: 23.001, lng: 120.220, items: 234, styles: ['Korean', 'Casual'], address: 'No. 78, Ximen Rd' },
+  { id: 4, name: 'Tokyo Drift Wear', category: 'japanese', rating: 4.6, reviews: 189, distance: 1.8, lat: 22.990, lng: 120.200, items: 156, styles: ['Japanese', 'Minimalist'], address: 'No. 33, Dongning Rd' },
+  { id: 5, name: 'Vintage Vault', category: 'vintage', rating: 4.5, reviews: 98, distance: 2.3, lat: 23.005, lng: 120.195, items: 67, styles: ['Vintage', 'Retro'], address: 'No. 5, Hai\'an Rd' },
+  { id: 6, name: 'Daily Basics', category: 'casual', rating: 4.4, reviews: 421, distance: 2.8, lat: 22.985, lng: 120.225, items: 312, styles: ['Casual', 'Basic'], address: 'No. 156, Chenggong Rd' },
+  { id: 7, name: 'Street Kings', category: 'streetwear', rating: 4.7, reviews: 278, distance: 3.5, lat: 23.010, lng: 120.230, items: 198, styles: ['Street', 'Hip-Hop'], address: 'No. 88, Beimen Rd' },
+  { id: 8, name: 'Minimalist Lab', category: 'casual', rating: 4.8, reviews: 156, distance: 4.2, lat: 22.978, lng: 120.190, items: 89, styles: ['Minimalist', 'Modern'], address: 'No. 22, Anping Rd' },
+];
 
 // ===================== STATE =====================
 let currentIndex = { tops: 0, bottoms: 0, shoes: 0 };
@@ -31,6 +43,9 @@ let personImageData = null;
 let aiResultImages = [];
 let preloadedBase64 = {};
 let modelReady = false;
+let currentPage = 'home';
+let selectedRadius = 1;
+let selectedStyles = [];
 
 // Auto-play
 let autoPlaying = false;
@@ -49,21 +64,97 @@ let adjustHistory = [];
 
 // ===================== INIT =====================
 document.addEventListener('DOMContentLoaded', () => {
+  initNavigation();
   renderCarousels();
   setupPhotoUpload();
   setupKeyboard();
   preloadImages();
   setupDragDrop();
   setupCompareSlider();
+  renderStores();
   useDefaultModel();
+
+  // Handle hash navigation
+  const hash = window.location.hash.replace('#', '');
+  if (hash && ['home', 'tryon', 'stores', 'stylist'].includes(hash)) {
+    navigateTo(hash);
+  }
 });
+
+// ===================== NAVIGATION =====================
+function initNavigation() {
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const page = link.dataset.page;
+      navigateTo(page);
+    });
+  });
+}
+
+function navigateTo(page) {
+  currentPage = page;
+  // Update nav links
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const activeLink = document.querySelector(`.nav-link[data-page="${page}"]`);
+  if (activeLink) activeLink.classList.add('active');
+
+  // Update pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const activePage = document.getElementById(`page-${page}`);
+  if (activePage) activePage.classList.add('active');
+
+  // Update URL hash
+  window.location.hash = page;
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+// ===================== AUTH MODAL =====================
+let authMode = 'login';
+
+function openAuthModal(mode) {
+  authMode = mode;
+  const modal = document.getElementById('authModal');
+  const title = document.getElementById('authTitle');
+  const nameGroup = document.getElementById('authNameGroup');
+  const submitBtn = document.getElementById('authSubmitBtn');
+  const switchText = document.getElementById('authSwitchText');
+  const switchLink = document.getElementById('authSwitchLink');
+
+  if (mode === 'register') {
+    title.textContent = 'Sign Up';
+    nameGroup.style.display = 'flex';
+    submitBtn.textContent = 'Create Account';
+    switchText.textContent = 'Already have an account?';
+    switchLink.textContent = 'Login';
+  } else {
+    title.textContent = 'Login';
+    nameGroup.style.display = 'none';
+    submitBtn.textContent = 'Login';
+    switchText.textContent = "Don't have an account?";
+    switchLink.textContent = 'Sign Up';
+  }
+
+  modal.classList.add('active');
+}
+
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('active');
+}
+
+function toggleAuthMode(e) {
+  e.preventDefault();
+  openAuthModal(authMode === 'login' ? 'register' : 'login');
+}
 
 // ===================== PRELOAD =====================
 function preloadImages() {
   const allItems = [...CLOTHING.tops, ...CLOTHING.bottoms, ...CLOTHING.shoes];
-  const img = allItems.map(item => item.img);
-  img.push('images/model/model1.jpg');
-  img.forEach(url => imageUrlToBase64(url));
+  const imgs = allItems.map(item => item.img);
+  imgs.push('images/model/model1.jpg');
+  imgs.forEach(url => imageUrlToBase64(url));
 }
 
 function imageUrlToBase64(url) {
@@ -139,7 +230,7 @@ async function startCamera() {
     video.srcObject = cameraStream;
     video.style.display = 'block';
   } catch (e) {
-    alert('無法啟動鏡頭：' + e.message);
+    alert('Cannot start camera: ' + e.message);
     setMode('photo');
   }
 }
@@ -218,9 +309,7 @@ function updateOutfitInfo() {
   const bottom = CLOTHING.bottoms[currentIndex.bottoms];
   const shoe = CLOTHING.shoes[currentIndex.shoes];
   document.getElementById('outfitItems').textContent = `${top.name} + ${bottom.name} + ${shoe.name}`;
-  const total = [top.price, bottom.price, shoe.price]
-    .map(p => parseInt(p.replace(/[$,]/g, '')))
-    .reduce((a, b) => a + b, 0);
+  const total = top.price + bottom.price + shoe.price;
   document.getElementById('outfitTotal').textContent = `$${total.toLocaleString()}`;
 }
 
@@ -229,7 +318,6 @@ function setupDragDrop() {
   const dropZone = document.getElementById('dropZone');
   const overlay = document.getElementById('dropOverlay');
 
-  // Use event delegation on document for drag events
   document.addEventListener('dragstart', (e) => {
     const item = e.target.closest('[data-category]');
     if (!item) return;
@@ -239,12 +327,10 @@ function setupDragDrop() {
       category: item.dataset.category,
       index: parseInt(item.dataset.index)
     }));
-    // Create a drag image from the item
     const dragImg = item.querySelector('img');
     if (dragImg) {
       e.dataTransfer.setDragImage(dragImg, 40, 40);
     }
-    console.log('[Drag] Started:', item.dataset.category, item.dataset.index);
   });
 
   document.addEventListener('dragend', () => {
@@ -261,7 +347,6 @@ function setupDragDrop() {
   });
 
   dropZone.addEventListener('dragleave', (e) => {
-    // Only hide if we actually left the drop zone (not just entering a child)
     if (!dropZone.contains(e.relatedTarget)) {
       overlay.classList.remove('visible');
       dropZone.classList.remove('drag-over');
@@ -278,17 +363,12 @@ function setupDragDrop() {
     if (!raw) return;
 
     const data = JSON.parse(raw);
-    console.log('[Drop] Received:', data.category, data.index);
-
-    // Update selection
     currentIndex[data.category] = data.index;
     renderCarousel(data.category);
 
-    // Visual feedback — flash the model container
     dropZone.style.boxShadow = '0 0 40px rgba(168,85,247,0.5)';
     setTimeout(() => { dropZone.style.boxShadow = ''; }, 600);
 
-    // Auto-trigger AI try-on
     tryOnWithAI();
   });
 }
@@ -314,7 +394,6 @@ function setupCompareSlider() {
   document.addEventListener('mousemove', (e) => { if (dragging) setPosition(e.clientX); });
   document.addEventListener('mouseup', () => { dragging = false; });
 
-  // Touch
   handle.addEventListener('touchstart', () => { dragging = true; });
   slider.addEventListener('touchstart', (e) => { dragging = true; setPosition(e.touches[0].clientX); });
   document.addEventListener('touchmove', (e) => { if (dragging) setPosition(e.touches[0].clientX); });
@@ -341,7 +420,7 @@ function hideCompareSlider() {
 function showSkeleton(text, step) {
   const skel = document.getElementById('skeletonOverlay');
   skel.classList.add('visible');
-  document.getElementById('skelText').textContent = text || 'AI 正在為您穿搭...';
+  document.getElementById('skelText').textContent = text || 'AI is styling you...';
   document.getElementById('skelStep').textContent = step || '';
 }
 
@@ -356,12 +435,12 @@ function toggleAutoPlay() {
   const indicator = document.getElementById('autoIndicator');
   if (autoPlaying) {
     btn.classList.add('active');
-    document.getElementById('autoIcon').textContent = '⏸';
+    document.getElementById('autoIcon').textContent = '\u23F8';
     indicator.style.display = 'block';
     runAutoPlay();
   } else {
     btn.classList.remove('active');
-    document.getElementById('autoIcon').textContent = '▶';
+    document.getElementById('autoIcon').textContent = '\u25B6';
     indicator.style.display = 'none';
     clearInterval(autoTimer);
     clearInterval(autoProgressTimer);
@@ -388,7 +467,8 @@ function runAutoPlay() {
 // ===================== KEYBOARD =====================
 function setupKeyboard() {
   document.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+    if (currentPage !== 'tryon') return;
     switch (e.key) {
       case 'ArrowLeft': cycleCategory('tops', -1); break;
       case 'ArrowRight': cycleCategory('tops', 1); break;
@@ -430,16 +510,15 @@ function getPersonImage() {
 // ===================== PROGRESSIVE AI TRY-ON =====================
 async function tryOnWithAI() {
   const personImg = getPersonImage();
-  if (!personImg) { alert('請先上傳照片或開啟鏡頭'); return; }
+  if (!personImg) { alert('Please upload a photo or enable camera first'); return; }
 
   const topImg = preloadedBase64[CLOTHING.tops[currentIndex.tops].img];
   const bottomImg = preloadedBase64[CLOTHING.bottoms[currentIndex.bottoms].img];
   const shoeImg = preloadedBase64[CLOTHING.shoes[currentIndex.shoes].img];
-  if (!topImg) { alert('衣物圖片尚未載入完成，請稍等幾秒後再試一次。'); return; }
+  if (!topImg) { alert('Clothing images are still loading. Please try again in a few seconds.'); return; }
 
   const cacheKey = getCacheKey();
 
-  // Check cache — instant display
   if (aiCache[cacheKey] && aiCache[cacheKey].full) {
     const cached = aiCache[cacheKey];
     const best = cached.full;
@@ -449,10 +528,7 @@ async function tryOnWithAI() {
     return;
   }
 
-  // Show skeleton loading on model area
-  showSkeleton('AI 正在為您穿搭...', '步驟 1/3 — 上衣合成');
-
-  // Also open modal for detailed progress
+  showSkeleton('AI is styling you...', 'Step 1/3 - Top');
   openAiModal();
   ['step1','step2','step3'].forEach(id => document.getElementById(id).className = 'step');
   document.getElementById('aiResults').style.display = 'block';
@@ -467,22 +543,21 @@ async function tryOnWithAI() {
     // STEP 1: Top
     let result1 = aiCache[cacheKey].top;
     if (!result1) {
-      setStepActive(1, '正在合成上衣...');
+      setStepActive(1, 'Synthesizing top...');
       result1 = await stepApiCall(personImg, topImg);
       aiCache[cacheKey].top = result1;
     }
     setStepDone(1);
     aiResultImages.push(result1);
-    appendResultCard(result1, '👕 上衣完成', 0);
-    // Update compare slider with first result
+    appendResultCard(result1, 'Top Complete', 0);
     showCompareSlider(`data:${result1.mimeType};base64,${result1.image}`);
-    showSkeleton('AI 正在為您穿搭...', '步驟 2/3 — 下著合成');
+    showSkeleton('AI is styling you...', 'Step 2/3 - Bottom');
 
     // STEP 2: Bottom
     const step1Person = `data:${result1.mimeType};base64,${result1.image}`;
     let result2 = aiCache[cacheKey].bottom;
     if (!result2 && bottomImg) {
-      setStepActive(2, '正在合成下著...');
+      setStepActive(2, 'Synthesizing bottom...');
       try {
         result2 = await stepApiCall(step1Person, bottomImg);
         aiCache[cacheKey].bottom = result2;
@@ -491,16 +566,16 @@ async function tryOnWithAI() {
     if (result2) {
       setStepDone(2);
       aiResultImages.push(result2);
-      appendResultCard(result2, '👖 上衣 + 下著', 1);
+      appendResultCard(result2, 'Top + Bottom', 1);
       showCompareSlider(`data:${result2.mimeType};base64,${result2.image}`);
     } else setStepDone(2, true);
-    showSkeleton('AI 正在為您穿搭...', '步驟 3/3 — 鞋款合成');
+    showSkeleton('AI is styling you...', 'Step 3/3 - Shoes');
 
     // STEP 3: Shoes
     const step2Person = result2 ? `data:${result2.mimeType};base64,${result2.image}` : step1Person;
     let result3 = aiCache[cacheKey].full;
     if (!result3 && shoeImg) {
-      setStepActive(3, '正在合成鞋款...');
+      setStepActive(3, 'Synthesizing shoes...');
       try {
         result3 = await stepApiCall(step2Person, shoeImg);
         aiCache[cacheKey].full = result3;
@@ -509,7 +584,7 @@ async function tryOnWithAI() {
     if (result3) {
       setStepDone(3);
       aiResultImages.push(result3);
-      appendResultCard(result3, '✨ 全身搭配完成！', 2);
+      appendResultCard(result3, 'Full Outfit Complete!', 2);
       showCompareSlider(`data:${result3.mimeType};base64,${result3.image}`);
     } else {
       setStepDone(3, true);
@@ -542,8 +617,8 @@ async function stepApiCall(personBase64, productBase64) {
     body: JSON.stringify({ personImage: personBase64, productImage: productBase64, sampleCount: 1 })
   });
   const data = await response.json();
-  if (!response.ok || !data.success) throw new Error(data.error || data.detail || `API 錯誤 (${response.status})`);
-  if (!data.results || data.results.length === 0) throw new Error('API 沒有回傳結果');
+  if (!response.ok || !data.success) throw new Error(data.error || data.detail || `API error (${response.status})`);
+  if (!data.results || data.results.length === 0) throw new Error('API returned no results');
   return data.results[0];
 }
 
@@ -567,7 +642,6 @@ function selectAiResult(idx) {
   document.querySelectorAll('.ai-result-card').forEach((card, i) => {
     card.classList.toggle('selected', i === idx);
   });
-  // Update compare slider
   if (aiResultImages[idx]) {
     const src = `data:${aiResultImages[idx].mimeType};base64,${aiResultImages[idx].image}`;
     showCompareSlider(src);
@@ -578,7 +652,7 @@ function selectAiResult(idx) {
 function setStepActive(num, text) {
   document.getElementById(`step${num}`).className = 'step active';
   document.getElementById('aiLoadingText').textContent = text;
-  document.getElementById('aiLoadingSubtext').textContent = `步驟 ${num}/3 — 大約 10-20 秒`;
+  document.getElementById('aiLoadingSubtext').textContent = `Step ${num}/3 - approximately 10-20 seconds`;
 }
 
 function setStepDone(num, skipped) {
@@ -598,27 +672,12 @@ function closeAiModal() {
   document.getElementById('aiModal').classList.remove('active');
 }
 
-function showAiResults(results) {
-  document.getElementById('aiLoading').style.display = 'none';
-  document.getElementById('aiResults').style.display = 'block';
-  document.getElementById('btnDownloadResult').style.display = 'flex';
-  document.getElementById('btnApplyResult').style.display = 'flex';
-  const labels = ['✨ 全身搭配', '👖 上衣+下著', '👕 僅上衣'];
-  document.getElementById('aiResultsGrid').innerHTML = results.map((r, i) => `
-    <div class="ai-result-card ${i === 0 ? 'selected' : ''}" onclick="selectAiResult(${i})">
-      <img src="data:${r.mimeType};base64,${r.image}" alt="結果 ${i+1}">
-      <div class="result-label">${labels[i] || `方案 ${i+1}`}</div>
-    </div>
-  `).join('');
-  selectAiResult(0);
-}
-
 function showAiError(message) {
   document.getElementById('aiLoading').style.display = 'none';
   document.getElementById('aiError').style.display = 'flex';
   let help = message;
   if (message.includes('fetch') || message.includes('Failed')) {
-    help = '無法連線到代理伺服器。\n\n請確認已啟動：\nnode server.js\n\n然後透過 http://localhost:8080 開啟';
+    help = 'Cannot connect to the proxy server.\n\nPlease start it:\nnode server.js\n\nThen open http://localhost:8080';
   }
   document.getElementById('aiErrorText').textContent = help;
 }
@@ -637,7 +696,7 @@ function downloadAiResult() {
   const r = aiResultImages[selectedAiIndex || 0];
   const link = document.createElement('a');
   link.href = `data:${r.mimeType};base64,${r.image}`;
-  link.download = `closetswipe-${Date.now()}.png`;
+  link.download = `stylehub-tryon-${Date.now()}.png`;
   link.click();
 }
 
@@ -647,36 +706,27 @@ async function adjustWithPrompt() {
   const prompt = input.value.trim();
   if (!prompt) return;
 
-  // Need a result to adjust
   if (!aiResultImages.length) {
-    alert('請先執行 AI 試穿後再輸入調整指令');
+    alert('Please run AI try-on first before entering adjustment commands');
     return;
   }
 
-  // Add user bubble
   addChatBubble(prompt, 'user');
   input.value = '';
 
-  // Get the current best result
   const currentResult = aiResultImages[selectedAiIndex || aiResultImages.length - 1];
   const resultBase64 = `data:${currentResult.mimeType};base64,${currentResult.image}`;
 
-  // Show skeleton
-  showSkeleton('正在調整...', `「${prompt}」`);
+  showSkeleton('Adjusting...', `"${prompt}"`);
 
   try {
     const response = await fetch('/api/adjust', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        resultImage: resultBase64,
-        prompt: prompt
-      })
+      body: JSON.stringify({ resultImage: resultBase64, prompt })
     });
     const data = await response.json();
-    if (!response.ok || !data.success) {
-      throw new Error(data.error || '調整失敗');
-    }
+    if (!response.ok || !data.success) throw new Error(data.error || 'Adjustment failed');
 
     hideSkeleton();
 
@@ -685,12 +735,12 @@ async function adjustWithPrompt() {
       aiResultImages.push(newResult);
       const src = `data:${newResult.mimeType};base64,${newResult.image}`;
       showCompareSlider(src);
-      addChatBubble('✓ 已調整', 'ai');
+      addChatBubble('Done!', 'ai');
       adjustHistory.push({ prompt, result: newResult });
     }
   } catch (err) {
     hideSkeleton();
-    addChatBubble(`⚠ ${err.message}`, 'ai');
+    addChatBubble(`Error: ${err.message}`, 'ai');
   }
 }
 
@@ -720,7 +770,6 @@ async function runBackgroundPregen() {
   if (!topImg) return;
 
   bgPregenRunning = true;
-  console.log('[Pre-gen] Starting for', cacheKey);
   if (!aiCache[cacheKey]) aiCache[cacheKey] = {};
 
   try {
@@ -728,7 +777,6 @@ async function runBackgroundPregen() {
       const r1 = await stepApiCall(personImg, topImg);
       if (getCacheKey() !== cacheKey) { bgPregenRunning = false; return; }
       aiCache[cacheKey].top = r1;
-      console.log('[Pre-gen] Step 1 done');
     }
 
     const bottomImg = preloadedBase64[CLOTHING.bottoms[currentIndex.bottoms].img];
@@ -737,7 +785,6 @@ async function runBackgroundPregen() {
       const r2 = await stepApiCall(p2, bottomImg);
       if (getCacheKey() !== cacheKey) { bgPregenRunning = false; return; }
       aiCache[cacheKey].bottom = r2;
-      console.log('[Pre-gen] Step 2 done');
     }
 
     const shoeImg = preloadedBase64[CLOTHING.shoes[currentIndex.shoes].img];
@@ -747,10 +794,265 @@ async function runBackgroundPregen() {
       const r3 = await stepApiCall(p3, shoeImg);
       if (getCacheKey() !== cacheKey) { bgPregenRunning = false; return; }
       aiCache[cacheKey].full = r3;
-      console.log('[Pre-gen] Full outfit cached!');
     }
   } catch (e) {
     console.warn('[Pre-gen] Error:', e.message);
   }
   bgPregenRunning = false;
+}
+
+// ===================== STORES PAGE =====================
+function setRadius(radius) {
+  selectedRadius = radius;
+  document.querySelectorAll('.radius-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.radius) === radius);
+  });
+  filterStores();
+}
+
+function filterStores() {
+  const category = document.getElementById('storeCategoryFilter').value;
+  const sortBy = document.getElementById('storeSortBy').value;
+
+  let filtered = STORES.filter(s => s.distance <= selectedRadius);
+  if (category !== 'all') {
+    filtered = filtered.filter(s => s.category === category);
+  }
+
+  if (sortBy === 'rating') filtered.sort((a, b) => b.rating - a.rating);
+  else if (sortBy === 'distance') filtered.sort((a, b) => a.distance - b.distance);
+  else if (sortBy === 'popular') filtered.sort((a, b) => b.reviews - a.reviews);
+
+  renderStoreList(filtered);
+  renderMapDots(filtered);
+}
+
+function renderStores() {
+  filterStores();
+}
+
+function renderStoreList(stores) {
+  const list = document.getElementById('storeList');
+  if (stores.length === 0) {
+    list.innerHTML = `
+      <div style="text-align:center;padding:40px 0;color:var(--text-dim)">
+        <div style="font-size:32px;margin-bottom:12px">&#x1F50D;</div>
+        <p>No stores found within ${selectedRadius}km.</p>
+        <p style="font-size:12px;margin-top:8px">Try expanding your search radius.</p>
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = stores.map(s => `
+    <div class="store-card" onclick="viewStore(${s.id})">
+      <div class="store-card-header">
+        <div class="store-name">${s.name}</div>
+        <div class="store-distance">${s.distance}km</div>
+      </div>
+      <div class="store-rating">
+        ${'&#x2605;'.repeat(Math.floor(s.rating))}${s.rating % 1 >= 0.5 ? '&#x2606;' : ''}
+        <span style="color:var(--text-dim)">${s.rating} (${s.reviews} reviews)</span>
+      </div>
+      <div class="store-tags">
+        ${s.styles.map(st => `<span class="store-tag">${st}</span>`).join('')}
+      </div>
+      <div class="store-meta">
+        <span>${s.items} items</span>
+        <span>${s.address}</span>
+      </div>
+      <div class="store-actions">
+        <button class="store-btn" onclick="event.stopPropagation();navigateTo('tryon')">Try-On</button>
+        <button class="store-btn store-btn-primary" onclick="event.stopPropagation()">View Store</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderMapDots(stores) {
+  const container = document.getElementById('mapDots');
+  const radiusSize = Math.min(selectedRadius * 40, 200);
+
+  let html = `
+    <div class="map-center-dot"></div>
+    <div class="map-radius-circle" style="width:${radiusSize * 2}px;height:${radiusSize * 2}px"></div>
+  `;
+
+  stores.forEach(s => {
+    // Position dots based on relative distance from center
+    const angle = Math.random() * Math.PI * 2;
+    const dist = (s.distance / selectedRadius) * radiusSize * 0.8;
+    const x = 50 + (Math.cos(angle) * dist / 5);
+    const y = 50 + (Math.sin(angle) * dist / 5);
+
+    html += `
+      <div class="map-dot" style="top:${y}%;left:${x}%" onclick="viewStore(${s.id})">
+        <div class="map-dot-label">${s.name}</div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function viewStore(storeId) {
+  const store = STORES.find(s => s.id === storeId);
+  if (!store) return;
+  alert(`Store: ${store.name}\nRating: ${store.rating}\nAddress: ${store.address}\nItems: ${store.items}\n\nFull store page coming soon!`);
+}
+
+// ===================== AI STYLIST PAGE =====================
+function toggleStyleChip(el) {
+  el.classList.toggle('active');
+  const style = el.dataset.style;
+  if (selectedStyles.includes(style)) {
+    selectedStyles = selectedStyles.filter(s => s !== style);
+  } else {
+    selectedStyles.push(style);
+  }
+}
+
+function getAiRecommendation() {
+  const occasion = document.getElementById('stylistOccasion').value;
+  const budgetMin = parseInt(document.getElementById('budgetMin').value) || 0;
+  const budgetMax = parseInt(document.getElementById('budgetMax').value) || 10000;
+
+  const query = `Recommend an outfit for ${occasion} occasion` +
+    (selectedStyles.length > 0 ? `, style: ${selectedStyles.join(', ')}` : '') +
+    `, budget: $${budgetMin}-$${budgetMax}`;
+
+  addStylistMessage(query, 'user');
+  generateRecommendation(occasion, selectedStyles, budgetMin, budgetMax);
+}
+
+function sendStylistMessage() {
+  const input = document.getElementById('stylistInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  addStylistMessage(text, 'user');
+
+  // Simple keyword-based response
+  setTimeout(() => {
+    generateChatRecommendation(text);
+  }, 500);
+}
+
+function addStylistMessage(text, type) {
+  const chat = document.getElementById('stylistChat');
+  const msg = document.createElement('div');
+  msg.className = `chat-message ${type}`;
+  msg.innerHTML = `
+    <div class="chat-avatar">${type === 'ai' ? 'AI' : 'You'}</div>
+    <div class="chat-content"><p>${text}</p></div>
+  `;
+  chat.appendChild(msg);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function addStylistMessageHTML(html) {
+  const chat = document.getElementById('stylistChat');
+  const msg = document.createElement('div');
+  msg.className = 'chat-message ai';
+  msg.innerHTML = `
+    <div class="chat-avatar">AI</div>
+    <div class="chat-content">${html}</div>
+  `;
+  chat.appendChild(msg);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function generateRecommendation(occasion, styles, budgetMin, budgetMax) {
+  // Filter items by budget
+  const allItems = [];
+  const categories = ['tops', 'bottoms', 'shoes'];
+  categories.forEach(cat => {
+    CLOTHING[cat].forEach(item => {
+      if (item.price >= budgetMin / 3 && item.price <= budgetMax / 2) {
+        allItems.push({ ...item, category: cat });
+      }
+    });
+  });
+
+  // Pick one from each category
+  const picks = {};
+  categories.forEach(cat => {
+    const catItems = CLOTHING[cat].filter(i => i.price <= budgetMax * 0.5);
+    if (catItems.length > 0) {
+      picks[cat] = catItems[Math.floor(Math.random() * catItems.length)];
+    }
+  });
+
+  const total = Object.values(picks).reduce((s, p) => s + (p ? p.price : 0), 0);
+
+  // Find matching store
+  const matchingStores = STORES.filter(s => {
+    if (styles.length === 0) return true;
+    return s.styles.some(st => styles.some(sel => st.toLowerCase().includes(sel.toLowerCase())));
+  }).sort((a, b) => b.rating - a.rating);
+
+  const store = matchingStores[0] || STORES[0];
+
+  let html = `<p>Based on your preferences, here's my recommendation for <strong>${occasion}</strong>:</p>`;
+  html += '<div class="rec-cards">';
+
+  Object.entries(picks).forEach(([cat, item]) => {
+    if (!item) return;
+    html += `
+      <div class="rec-card" onclick="navigateToTryOn('${cat}', ${CLOTHING[cat].indexOf(item)})">
+        <div class="rec-card-img"><img src="${item.img}" alt="${item.name}"></div>
+        <div class="rec-card-name">${item.name}</div>
+        <div class="rec-card-price">$${item.price.toLocaleString()}</div>
+        <div class="rec-card-store">${store.name}</div>
+      </div>
+    `;
+  });
+
+  html += '</div>';
+  html += `<p style="margin-top:12px">Total: <strong>$${total.toLocaleString()}</strong> | Available at <strong>${store.name}</strong> (${store.distance}km away, ${store.rating} rating)</p>`;
+  html += `<p style="font-size:12px;color:var(--text-dim)">Click any item to try it on virtually!</p>`;
+
+  addStylistMessageHTML(html);
+}
+
+function generateChatRecommendation(text) {
+  const lower = text.toLowerCase();
+
+  if (lower.includes('casual') || lower.includes('daily') || lower.includes('weekend') || lower.includes('brunch')) {
+    generateRecommendation('daily', ['casual'], 0, 5000);
+  } else if (lower.includes('formal') || lower.includes('work') || lower.includes('office') || lower.includes('business') || lower.includes('meeting')) {
+    generateRecommendation('work', ['formal'], 0, 8000);
+  } else if (lower.includes('date') || lower.includes('dinner') || lower.includes('romantic')) {
+    generateRecommendation('date', [], 0, 6000);
+  } else if (lower.includes('street') || lower.includes('hip') || lower.includes('urban')) {
+    generateRecommendation('daily', ['street'], 0, 5000);
+  } else if (lower.includes('party') || lower.includes('event') || lower.includes('club')) {
+    generateRecommendation('party', [], 0, 7000);
+  } else {
+    addStylistMessage(
+      "I'd be happy to help! Could you tell me more about the occasion? For example: casual daily wear, work/office, date night, street style, or a party? You can also set your preferences using the form on the left.",
+      'ai'
+    );
+  }
+}
+
+function navigateToTryOn(category, index) {
+  currentIndex[category] = index;
+  navigateTo('tryon');
+  renderCarousel(category);
+}
+
+// ===================== STORE API =====================
+// API endpoint for stores (used when backend is available)
+async function fetchStores() {
+  try {
+    const response = await fetch(`/api/stores?radius=${selectedRadius}`);
+    if (response.ok) {
+      const data = await response.json();
+      if (data.stores) return data.stores;
+    }
+  } catch (e) {
+    // Fall back to mock data
+  }
+  return null;
 }
